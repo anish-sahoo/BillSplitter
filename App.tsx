@@ -50,13 +50,13 @@ const smallCardStyle = StyleSheet.create({
 });
 
 function App(): React.JSX.Element {
-  const [person, setPerson] = useState<Person[]>([]);
-  const [addName, setAddName] = useState<string>('');
-  const [selectedPerson, setSelectedPerson] = useState<number>(-1);
-  const [price, setPrice] = useState<string>('');
-  const [setOfUsers, setSetOfUsers] = useState<Set<string>>(new Set<string>());
-  const [feesTipes, setFeesTips] = useState<number>(0);
-  const [tax, setTax] = useState<number>(0);
+  const [person, setPerson] = useState<Person[]>([]); // list of user objects
+  const [addName, setAddName] = useState<string>(''); // name of the user to be added
+  const [selectedPerson, setSelectedPerson] = useState<number>(-1); // index of the selected person
+  const [price, setPrice] = useState<string>(''); // price of the item
+  const [setOfUsers, setSetOfUsers] = useState<Set<string>>(new Set<string>()); // set of user names
+  const [feesTipes, setFeesTips] = useState<number>(0); // fees and tips
+  const [tax, setTax] = useState<number>(0); // tax
 
   const handleAddName = (name: string) => {
     if (name === '') {
@@ -119,10 +119,15 @@ function App(): React.JSX.Element {
                   </Text>
                   <TouchableOpacity
                     onPress={() =>
-                      setPerson(prevPersons =>
+                      {setPerson(prevPersons =>
                         prevPersons.filter((_, index) => index !== i),
                       )
-                    }
+                      setSetOfUsers(prevSet => {
+                        const newSet = new Set(prevSet);
+                        newSet.delete(p.name.toLowerCase());
+                        return newSet;
+                      })
+                    }}
                     className="self-start">
                     <Text className="text-red-500 text-3xl">x</Text>
                   </TouchableOpacity>
@@ -218,9 +223,6 @@ function App(): React.JSX.Element {
             ))}
           </View>
         </View>
-        <Text>
-          Made by Anish Sahoo, Zaydaan Jahangir, William Riser, Rohan Parikh
-        </Text>
       </ScrollView>
     </View>
   );
