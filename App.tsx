@@ -6,15 +6,29 @@
  */
 
 import React, {useState} from 'react';
-import {Button as RNButton, Text, TextInput, View, ScrollView} from 'react-native';
+import {Button, Text, TextInput, View, ScrollView} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import './global.css';
-import {Button, Card, IconButton} from 'react-native-paper';
+import {Card} from 'react-native-paper';
+import {StyleSheet} from 'nativewind';
 
 interface Person {
   name: string;
   items: number[];
 }
+
+const cardStyle = StyleSheet.create({
+  borderRadius: 10,
+  elevation: 3,
+  backgroundColor: '#fff',
+  shadowOffset: {width: 1, height: 1},
+  shadowColor: '#333',
+  shadowOpacity: 0.3,
+  shadowRadius: 2,
+  marginHorizontal: 10,
+  marginVertical: 6,
+  padding: 8,
+});
 
 function App(): React.JSX.Element {
   const [person, setPerson] = useState<Person[]>([]);
@@ -68,58 +82,43 @@ function App(): React.JSX.Element {
           />
           <Button
             className="ml-2 rounded-2xl"
-            onTouchStart={() => handleAddName(addName)}
-            mode="contained-tonal"
-            compact={true}
-          >
-            Add Person
-          </Button>
+            onPress={() => handleAddName(addName)}
+            title="Add Person"
+          />
         </View>
         <View className="flex flex-row flex-wrap gap-2 my-4 mb-8">
           {person.map((p, i) => (
-            <View key={i} className="p-8">
-              <Card mode="elevated" style={{backgroundColor: '#FFFFFF'}}>
-                <Card.Content>
-                  <View>
-                    <View className="flex flex-row justify-between">
-                      <Text className="text-xl font-bold my-auto mr-2">
-                        {p.name}
-                      </Text>
-                      <Button
-                        onPress={() =>
-                          setPerson(prevPersons =>
-                            prevPersons.filter((_, index) => index !== i),
-                          )
-                        }
-                        // title='x'
-                        className="text-4xl self-start text-red-500"
-                      >
-                        x
-                      </Button>
-                    </View>
-                    <View>
-                      {p.items.map((item, index) => (
-                        <View
-                          key={index}
-                          className="flex flex-row justify-between">
-                          <Text className="text-sm font-semibold text-green-600 pt-1 mr-2 text-left">{`+ $${item}`}</Text>
-                          <Button
-                            title="x"
-                            className="self-start"
-                            onPress={() => {
-                              const newPerson = [...person];
-                              newPerson[i].items = newPerson[i].items.filter(
-                                (_, j) => j !== index,
-                              );
-                              setPerson(newPerson);
-                            }}
-                          />
-                        </View>
-                      ))}
-                    </View>
+            <View key={i} className="p-8 border-2">
+              <View className="flex flex-row justify-between">
+                <Text className="text-xl font-bold my-auto mr-2">{p.name}</Text>
+                <Button
+                  onPress={() =>
+                    setPerson(prevPersons =>
+                      prevPersons.filter((_, index) => index !== i),
+                    )
+                  }
+                  title="x"
+                  className="text-4xl self-start text-red-500"
+                />
+              </View>
+              <View>
+                {p.items.map((item, index) => (
+                  <View key={index} className="flex flex-row justify-between">
+                    <Text className="text-sm font-semibold text-green-600 pt-1 mr-2 text-left">{`+ $${item}`}</Text>
+                    <RNButton
+                      title="x"
+                      className="self-start"
+                      onPress={() => {
+                        const newPerson = [...person];
+                        newPerson[i].items = newPerson[i].items.filter(
+                          (_, j) => j !== index,
+                        );
+                        setPerson(newPerson);
+                      }}
+                    />
                   </View>
-                </Card.Content>
-              </Card>
+                ))}
+              </View>
             </View>
           ))}
         </View>
@@ -145,9 +144,10 @@ function App(): React.JSX.Element {
                       className="w-2/3 border-2 border-gray-300 rounded-2xl p-2"
                       value={price}
                     />
-                    <Button onTouchStart={() => handleAddPrice()} mode='contained-tonal' compact={true}>
-                      Add Price
-                    </Button>
+                    <Button
+                      onTouchStart={() => handleAddPrice()}
+                      title="Add Price"
+                    />
                   </View>
                 </View>
               </Card.Content>
@@ -155,7 +155,10 @@ function App(): React.JSX.Element {
           </View>
         )}
         <View className="w-full items-center p-4">
-          <Card mode="elevated" style={{backgroundColor: '#FFFFFF'}} className="w-full">
+          <Card
+            mode="elevated"
+            style={{backgroundColor: '#FFFFFF'}}
+            className="w-full">
             <Card.Content>
               <View className="flex flex-row my-1">
                 <TextInput
@@ -195,6 +198,10 @@ function App(): React.JSX.Element {
         <Text>
           Made by Anish Sahoo, Zaydaan Jahangir, William Riser, Rohan Parikh
         </Text>
+
+        <View style={cardStyle}>
+          <Text>Hello</Text>
+        </View>
       </ScrollView>
     </View>
   );
