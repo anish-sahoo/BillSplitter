@@ -6,10 +6,10 @@
  */
 
 import React, {useState} from 'react';
-import {Button, Text, TextInput, View, ScrollView} from 'react-native';
+import {Button as RNButton, Text, TextInput, View, ScrollView} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import './global.css';
-import {Card} from 'react-native-paper';
+import {Button, Card, IconButton} from 'react-native-paper';
 
 interface Person {
   name: string;
@@ -30,6 +30,7 @@ function App(): React.JSX.Element {
       return;
     }
     if (setOfUsers.has(name.toLowerCase())) {
+      setAddName('');
       return;
     }
     setPerson([...person, {name, items: []}]);
@@ -52,8 +53,8 @@ function App(): React.JSX.Element {
   };
 
   return (
-    <View className="w-screen text-center flex flex-col items-center justify-center ">
-      <ScrollView className="p-8">
+    <View className="light w-screen text-center flex flex-col items-center justify-center ">
+      <ScrollView className="p-8 w-screen">
         <Text className="text-center font-mono text-4xl mt-4">
           Bill Splitter
         </Text>
@@ -67,9 +68,12 @@ function App(): React.JSX.Element {
           />
           <Button
             className="ml-2 rounded-2xl"
-            title="Add Person"
-            onPress={() => handleAddName(addName)}
-          />
+            onTouchStart={() => handleAddName(addName)}
+            mode="contained-tonal"
+            compact={true}
+          >
+            Add Person
+          </Button>
         </View>
         <View className="flex flex-row flex-wrap gap-2 my-4 mb-8">
           {person.map((p, i) => (
@@ -82,14 +86,16 @@ function App(): React.JSX.Element {
                         {p.name}
                       </Text>
                       <Button
-                        title="X"
-                        className="text-sm self-start text-red-500"
                         onPress={() =>
                           setPerson(prevPersons =>
                             prevPersons.filter((_, index) => index !== i),
                           )
                         }
-                      />
+                        // title='x'
+                        className="text-4xl self-start text-red-500"
+                      >
+                        x
+                      </Button>
                     </View>
                     <View>
                       {p.items.map((item, index) => (
@@ -118,7 +124,7 @@ function App(): React.JSX.Element {
           ))}
         </View>
         {person.length > 0 && (
-          <View className="w-full items-center">
+          <View className="items-center">
             <Card mode="elevated" style={{backgroundColor: '#FFFFFF'}}>
               <Card.Content>
                 <View className="flex flex-col">
@@ -139,7 +145,9 @@ function App(): React.JSX.Element {
                       className="w-2/3 border-2 border-gray-300 rounded-2xl p-2"
                       value={price}
                     />
-                    <Button title="Add Price" onPress={handleAddPrice} />
+                    <Button onTouchStart={() => handleAddPrice()} mode='contained-tonal' compact={true}>
+                      Add Price
+                    </Button>
                   </View>
                 </View>
               </Card.Content>
