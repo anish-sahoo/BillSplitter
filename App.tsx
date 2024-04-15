@@ -86,18 +86,18 @@ function App(): React.JSX.Element {
   };
 
   return (
-    <View className="light w-screen text-center flex flex-col items-center justify-center dark:bg-neutral-800">
-      <ScrollView className="p-8 w-screen">
+    <View className="light w-screen text-center flex flex-col items-center justify-center min-h-screen dark:bg-neutral-800">
+      <ScrollView className="p-8 w-screen flex-grow">
         <Text className="text-center font-mono text-4xl mb-8">
           Bill Splitter
         </Text>
-        <View className="flex flex-row mx-auto">
+        <View className={`flex flex-row mx-auto ${person.length <= 0 ? 'justify-center' : ''}`}>
           <TextInput
             placeholder="Name"
             onChangeText={text => setAddName(text)}
             value={addName}
             onSubmitEditing={() => handleAddName(addName)}
-            className="rounded-2xl p-2 px-4 w-2/3 bg-zinc-100 dark:bg-black dark:text-white"
+            className="rounded-2xl p-2 px-4 w-2/3 bg-zinc-100 dark:bg-zinc-600 dark:text-white"
           />
           <TouchableOpacity
             activeOpacity={0.6}
@@ -159,7 +159,7 @@ function App(): React.JSX.Element {
         {person.length > 0 && (
           <View className="items-center" style={cardStyle}>
             <View className="flex flex-col w-full p-4">
-              <View className="bg-zinc-100 rounded-2xl">
+              <View className="bg-zinc-100 dark:bg-zinc-600 rounded-2xl">
                 <Picker
                   placeholder='Select a Person'
                   selectedValue={selectedPerson}
@@ -176,7 +176,7 @@ function App(): React.JSX.Element {
                 <TextInput
                   placeholder="Price"
                   onChangeText={text => setPrice(text)}
-                  className="flex-grow bg-zinc-100 rounded-2xl px-4 py-2 justify-start"
+                  className="flex-grow bg-zinc-100 dark:bg-zinc-600 rounded-2xl px-4 py-2 justify-start"
                   value={price}
                 />
                 <View className="">
@@ -197,12 +197,12 @@ function App(): React.JSX.Element {
           <View className="flex flex-col my-1 w-full">
             <TextInput
               placeholder="Tips/Fees"
-              className="w-3/5 mx-auto my-1 bg-zinc-100 rounded-2xl px-4 py-2"
+              className="w-3/5 mx-auto my-1 bg-zinc-100 dark:bg-zinc-600 rounded-2xl px-4 py-2"
               onChangeText={text => setFeesTips(parseFloat(text) || 0)}
             />
             <TextInput
               placeholder="Tax %"
-              className="w-3/5 mx-auto my-1 bg-zinc-100 rounded-2xl px-4 py-2"
+              className="w-3/5 mx-auto my-1 bg-zinc-100 dark:bg-zinc-600 rounded-2xl px-4 py-2"
               onChangeText={text => setTax(parseFloat(text) || 0)}
             />
           </View>
