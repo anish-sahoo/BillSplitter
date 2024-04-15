@@ -5,12 +5,17 @@
  * @format
  */
 
-import React, {useState} from 'react';
-import {Button, Text, TextInput, View, ScrollView} from 'react-native';
+import {useState} from 'react';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import './global.css';
-import {Card} from 'react-native-paper';
-import {StyleSheet} from 'nativewind';
 
 interface Person {
   name: string;
@@ -28,6 +33,20 @@ const cardStyle = StyleSheet.create({
   marginHorizontal: 10,
   marginVertical: 6,
   padding: 8,
+});
+
+const smallCardStyle = StyleSheet.create({
+  borderRadius: 10,
+  elevation: 3,
+  backgroundColor: '#fff',
+  shadowOffset: {width: 1, height: 1},
+  shadowColor: '#333',
+  shadowOpacity: 0.3,
+  shadowRadius: 2,
+  marginHorizontal: 6,
+  marginVertical: 6,
+  paddingHorizontal: 8,
+  paddingVertical: 4,
 });
 
 function App(): React.JSX.Element {
@@ -67,9 +86,9 @@ function App(): React.JSX.Element {
   };
 
   return (
-    <View className="light w-screen text-center flex flex-col items-center justify-center ">
+    <View className="light w-screen text-center flex flex-col items-center justify-center dark:bg-neutral-800">
       <ScrollView className="p-8 w-screen">
-        <Text className="text-center font-mono text-4xl mt-4">
+        <Text className="text-center font-mono text-4xl mb-8">
           Bill Splitter
         </Text>
         <View className="flex flex-row mx-auto">
@@ -78,130 +97,130 @@ function App(): React.JSX.Element {
             onChangeText={text => setAddName(text)}
             value={addName}
             onSubmitEditing={() => handleAddName(addName)}
-            className="border-2 border-gray-300 rounded-2xl p-2 w-2/3"
+            className="rounded-2xl p-2 px-4 w-2/3 bg-zinc-100 dark:bg-black dark:text-white"
           />
-          <Button
-            className="ml-2 rounded-2xl"
+          <TouchableOpacity
+            activeOpacity={0.6}
+            className="ml-2 my-auto"
             onPress={() => handleAddName(addName)}
-            title="Add Person"
-          />
+          >
+            <Text className="bg-zinc-300 text-black py-2 px-4 rounded-2xl text-xl text-wrap">
+              Add
+            </Text>
+          </TouchableOpacity>
         </View>
-        <View className="flex flex-row flex-wrap gap-2 my-4 mb-8">
+        <View className="flex flex-row flex-wrap my-4 mb-8 mx-auto justify-center items-center">
           {person.map((p, i) => (
-            <View key={i} className="p-8 border-2">
-              <View className="flex flex-row justify-between">
-                <Text className="text-xl font-bold my-auto mr-2">{p.name}</Text>
-                <Button
-                  onPress={() =>
-                    setPerson(prevPersons =>
-                      prevPersons.filter((_, index) => index !== i),
-                    )
-                  }
-                  title="x"
-                  className="text-4xl self-start text-red-500"
-                />
-              </View>
-              <View>
-                {p.items.map((item, index) => (
-                  <View key={index} className="flex flex-row justify-between">
-                    <Text className="text-sm font-semibold text-green-600 pt-1 mr-2 text-left">{`+ $${item}`}</Text>
-                    <RNButton
-                      title="x"
-                      className="self-start"
-                      onPress={() => {
-                        const newPerson = [...person];
-                        newPerson[i].items = newPerson[i].items.filter(
-                          (_, j) => j !== index,
-                        );
-                        setPerson(newPerson);
-                      }}
-                    />
-                  </View>
-                ))}
+            <View key={i} style={smallCardStyle}>
+              <View className="p-2">
+                <View className="flex flex-row justify-between">
+                  <Text className="text-xl font-bold my-auto mr-2 text-black">
+                    {p.name}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() =>
+                      setPerson(prevPersons =>
+                        prevPersons.filter((_, index) => index !== i),
+                      )
+                    }
+                    className="self-start">
+                    <Text className="text-red-500 text-3xl">x</Text>
+                  </TouchableOpacity>
+                </View>
+                <View>
+                  {p.items.map((item, index) => (
+                    <View key={index} className="flex flex-row justify-between">
+                      <Text className="text-sm font-semibold text-green-600 pt-1 mr-2 text-left">{`+ $${item}`}</Text>
+                      <TouchableOpacity
+                        className="self-start"
+                        onPress={() => {
+                          const newPerson = [...person];
+                          newPerson[i].items = newPerson[i].items.filter(
+                            (_, j) => j !== index,
+                          );
+                          setPerson(newPerson);
+                        }}>
+                        <Text className="text-black dark:text-white text-lg">
+                          x
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </View>
               </View>
             </View>
           ))}
         </View>
         {person.length > 0 && (
-          <View className="items-center">
-            <Card mode="elevated" style={{backgroundColor: '#FFFFFF'}}>
-              <Card.Content>
-                <View className="flex flex-col">
-                  <Picker
-                    selectedValue={selectedPerson}
-                    onValueChange={(itemValue, itemIndex) =>
-                      setSelectedPerson(itemValue)
-                    }>
-                    <Picker.Item label="Select a Person" value={-1} />
-                    {person.map((p, index) => (
-                      <Picker.Item key={index} label={p.name} value={index} />
-                    ))}
-                  </Picker>
-                  <View className="flex flex-row mx-auto gap-2">
-                    <TextInput
-                      placeholder="Price"
-                      onChangeText={text => setPrice(text)}
-                      className="w-2/3 border-2 border-gray-300 rounded-2xl p-2"
-                      value={price}
-                    />
-                    <Button
-                      onTouchStart={() => handleAddPrice()}
-                      title="Add Price"
-                    />
-                  </View>
+          <View className="items-center" style={cardStyle}>
+            <View className="flex flex-col w-full p-4">
+              <View className="bg-zinc-100 rounded-2xl">
+                <Picker
+                  placeholder='Select a Person'
+                  selectedValue={selectedPerson}
+                  onValueChange={(itemValue, itemIndex) =>
+                    setSelectedPerson(itemValue)
+                  }>
+                  <Picker.Item label="Select a Person" value={-1} className="text-gray-800" />
+                  {person.map((p, index) => (
+                    <Picker.Item key={index} label={p.name} value={index} />
+                  ))}
+                </Picker>
+              </View>
+              <View className={`flex flex-row w-full mt-2 ${selectedPerson === -1 ? 'hidden' : ''}`}>
+                <TextInput
+                  placeholder="Price"
+                  onChangeText={text => setPrice(text)}
+                  className="flex-grow bg-zinc-100 rounded-2xl px-4 py-2 justify-start"
+                  value={price}
+                />
+                <View className="">
+                <TouchableOpacity
+                className="my-auto ml-2"
+                  activeOpacity={0.6}
+                  onPress={() => handleAddPrice()}>
+                  <Text className="text-center bg-zinc-300 text-black rounded-2xl text-lg p-2">
+                    Add Price
+                  </Text>
+                </TouchableOpacity>
                 </View>
-              </Card.Content>
-            </Card>
+              </View>
+            </View>
           </View>
         )}
-        <View className="w-full items-center p-4">
-          <Card
-            mode="elevated"
-            style={{backgroundColor: '#FFFFFF'}}
-            className="w-full">
-            <Card.Content>
-              <View className="flex flex-row my-1">
-                <TextInput
-                  placeholder="Tips/Fees"
-                  className="w-2/5  mx-2 ml-auto rounded-2xl border-2 border-gray-300 rounded-2xl p-2"
-                  onChangeText={text => setFeesTips(parseFloat(text) || 0)}
-                />
-                <TextInput
-                  placeholder="Tax %"
-                  className="w-2/5 mx-2 mr-auto rounded-2xl border-2 border-gray-300 rounded-2xl p-2"
-                  onChangeText={text => setTax(parseFloat(text) || 0)}
-                />
-              </View>
+        <View className={`items-center p-4 ${person.length > 0 ? '' : 'hidden'}`} style={cardStyle}>
+          <View className="flex flex-col my-1 w-full">
+            <TextInput
+              placeholder="Tips/Fees"
+              className="w-3/5 mx-auto my-1 bg-zinc-100 rounded-2xl px-4 py-2"
+              onChangeText={text => setFeesTips(parseFloat(text) || 0)}
+            />
+            <TextInput
+              placeholder="Tax %"
+              className="w-3/5 mx-auto my-1 bg-zinc-100 rounded-2xl px-4 py-2"
+              onChangeText={text => setTax(parseFloat(text) || 0)}
+            />
+          </View>
 
-              <View className="flex flex-row flex-wrap w-full justify-center mt-8">
-                {person.map((p, i) => (
-                  <View key={i} className="">
-                    <Card mode="elevated" style={{backgroundColor: '#FFFFFF'}}>
-                      <Card.Content>
-                        <Text>{p.name}</Text>
-                        <Text>
-                          $
-                          {(
-                            p.items.reduce((total, item) => total + item, 0) *
-                              (1 + tax / 100) +
-                            feesTipes / person.length
-                          ).toFixed(2)}
-                        </Text>
-                      </Card.Content>
-                    </Card>
-                  </View>
-                ))}
+          <View className="flex flex-row flex-wrap w-full justify-center mt-4">
+            {person.map((p, i) => (
+              <View key={i} className="" style={cardStyle}>
+                <Text className="text-black">{p.name}</Text>
+                <Text className="text-black">
+                  $
+                  {(
+                    p.items.reduce((total, item) => total + item, 0) *
+                      (1 + tax / 100) +
+                    feesTipes / person.length
+                  ).toFixed(2)}
+                </Text>
               </View>
-            </Card.Content>
-          </Card>
+            ))}
+          </View>
         </View>
         <Text>
           Made by Anish Sahoo, Zaydaan Jahangir, William Riser, Rohan Parikh
         </Text>
-
-        <View style={cardStyle}>
-          <Text>Hello</Text>
-        </View>
       </ScrollView>
     </View>
   );
