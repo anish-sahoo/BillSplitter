@@ -52,7 +52,7 @@ function App(): React.JSX.Element {
   };
 
   return (
-    <View className="w-screen text-center flex flex-col items-center justify-center bg-white">
+    <View className="w-screen text-center flex flex-col items-center justify-center ">
       <ScrollView className="p-8">
         <Text className="text-center font-mono text-4xl mt-4">
           Bill Splitter
