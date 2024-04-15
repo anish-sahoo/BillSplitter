@@ -9,6 +9,7 @@ import React, {useState} from 'react';
 import {Button, Text, TextInput, View, ScrollView} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import './global.css';
+import {Card} from 'react-native-paper';
 
 interface Person {
   name: string;
@@ -167,6 +168,11 @@ function App(): React.JSX.Element {
         <Text>
           Made by Anish Sahoo, Zaydaan Jahangir, William Riser, Rohan Parikh
         </Text>
+        <View className="p-8">
+          <Card mode="elevated" style={{backgroundColor: '#FFFFFF'}}>
+            <Card.Title title="Card Title" subtitle="Card Subtitle" />
+          </Card>
+        </View>
       </ScrollView>
     </View>
   );
