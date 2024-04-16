@@ -13,6 +13,7 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
+  useColorScheme,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import './global.css';
@@ -26,6 +27,19 @@ const cardStyle = StyleSheet.create({
   borderRadius: 10,
   elevation: 3,
   backgroundColor: '#fff',
+  shadowOffset: {width: 1, height: 1},
+  shadowColor: '#333',
+  shadowOpacity: 0.3,
+  shadowRadius: 2,
+  marginHorizontal: 10,
+  marginVertical: 6,
+  padding: 8,
+});
+
+const darkCardStyle = StyleSheet.create({
+  borderRadius: 10,
+  elevation: 3,
+  backgroundColor: '#404040',
   shadowOffset: {width: 1, height: 1},
   shadowColor: '#333',
   shadowOpacity: 0.3,
@@ -58,6 +72,8 @@ function App(): React.JSX.Element {
   const [feesTipes, setFeesTips] = useState<number>(0); // fees and tips
   const [tax, setTax] = useState<number>(0); // tax
 
+  const colorScheme = useColorScheme();
+
   const handleAddName = (name: string) => {
     if (name === '') {
       return;
@@ -87,8 +103,8 @@ function App(): React.JSX.Element {
 
   return (
     <View className="light w-screen text-center flex flex-col items-center justify-center min-h-screen dark:bg-neutral-800">
-      <ScrollView className="p-8 w-screen flex-grow">
-        <Text className="text-center font-mono text-4xl mb-8">
+      <ScrollView className="p-8 w-screen">
+        <Text className="text-center font-mono text-4xl mb-8 dark:text-white">
           Bill Splitter
         </Text>
         <View className={`flex flex-row mx-auto ${person.length <= 0 ? 'justify-center' : ''}`}>
@@ -157,7 +173,7 @@ function App(): React.JSX.Element {
           ))}
         </View>
         {person.length > 0 && (
-          <View className="items-center" style={cardStyle}>
+          <View className="items-center" style={colorScheme == 'light'? cardStyle : darkCardStyle}>
             <View className="flex flex-col w-full p-4">
               <View className="bg-zinc-100 dark:bg-zinc-600 rounded-2xl">
                 <Picker
@@ -174,9 +190,9 @@ function App(): React.JSX.Element {
               </View>
               <View className={`flex flex-row w-full mt-2 ${selectedPerson === -1 ? 'hidden' : ''}`}>
                 <TextInput
-                  placeholder="Price"
+                  placeholder=" Price"
                   onChangeText={text => setPrice(text)}
-                  className="flex-grow bg-zinc-100 dark:bg-zinc-600 rounded-2xl px-4 py-2 justify-start"
+                  className="flex-grow bg-zinc-100 dark:bg-zinc-600 rounded-xl px-4 py-2 justify-start"
                   value={price}
                 />
                 <View className="">
@@ -193,15 +209,15 @@ function App(): React.JSX.Element {
             </View>
           </View>
         )}
-        <View className={`items-center p-4 ${person.length > 0 ? '' : 'hidden'}`} style={cardStyle}>
+        <View className={`items-center p-4 ${person.length > 0 ? '' : 'hidden'}`} style={colorScheme == 'light'? cardStyle : darkCardStyle}>
           <View className="flex flex-col my-1 w-full">
             <TextInput
-              placeholder="Tips/Fees"
+              placeholder=" Tips/Fees"
               className="w-3/5 mx-auto my-1 bg-zinc-100 dark:bg-zinc-600 rounded-2xl px-4 py-2"
               onChangeText={text => setFeesTips(parseFloat(text) || 0)}
             />
             <TextInput
-              placeholder="Tax %"
+              placeholder=" Tax %"
               className="w-3/5 mx-auto my-1 bg-zinc-100 dark:bg-zinc-600 rounded-2xl px-4 py-2"
               onChangeText={text => setTax(parseFloat(text) || 0)}
             />
@@ -222,6 +238,9 @@ function App(): React.JSX.Element {
               </View>
             ))}
           </View>
+        </View>
+        <View className="h-16">
+
         </View>
       </ScrollView>
     </View>
