@@ -107,7 +107,10 @@ function App(): React.JSX.Element {
         <Text className="text-center font-mono text-4xl mb-8 dark:text-white">
           Bill Splitter
         </Text>
-        <View className={`flex flex-row mx-auto ${person.length <= 0 ? 'justify-center' : ''}`}>
+        <View
+          className={`flex flex-row mx-auto ${
+            person.length <= 0 ? 'justify-center' : ''
+          }`}>
           <TextInput
             placeholder="Name"
             onChangeText={text => setAddName(text)}
@@ -118,8 +121,7 @@ function App(): React.JSX.Element {
           <TouchableOpacity
             activeOpacity={0.6}
             className="ml-2 my-auto"
-            onPress={() => handleAddName(addName)}
-          >
+            onPress={() => handleAddName(addName)}>
             <Text className="bg-zinc-300 text-black py-2 px-4 rounded-2xl text-xl text-wrap">
               Add
             </Text>
@@ -134,15 +136,15 @@ function App(): React.JSX.Element {
                     {p.name}
                   </Text>
                   <TouchableOpacity
-                    onPress={() =>
-                      {setPerson(prevPersons =>
+                    onPress={() => {
+                      setPerson(prevPersons =>
                         prevPersons.filter((_, index) => index !== i),
-                      )
+                      );
                       setSetOfUsers(prevSet => {
                         const newSet = new Set(prevSet);
                         newSet.delete(p.name.toLowerCase());
                         return newSet;
-                      })
+                      });
                     }}
                     className="self-start">
                     <Text className="text-red-500 text-3xl">x</Text>
@@ -173,22 +175,31 @@ function App(): React.JSX.Element {
           ))}
         </View>
         {person.length > 0 && (
-          <View className="items-center" style={colorScheme == 'light'? cardStyle : darkCardStyle}>
+          <View
+            className="items-center"
+            style={colorScheme == 'light' ? cardStyle : darkCardStyle}>
             <View className="flex flex-col w-full p-4">
               <View className="bg-zinc-100 dark:bg-zinc-600 rounded-2xl">
                 <Picker
-                  placeholder='Select a Person'
+                  placeholder="Select a Person"
                   selectedValue={selectedPerson}
                   onValueChange={(itemValue, itemIndex) =>
                     setSelectedPerson(itemValue)
                   }>
-                  <Picker.Item label="Select a Person" value={-1} className="text-gray-800" />
+                  <Picker.Item
+                    label="Select a Person"
+                    value={-1}
+                    className="text-gray-800"
+                  />
                   {person.map((p, index) => (
                     <Picker.Item key={index} label={p.name} value={index} />
                   ))}
                 </Picker>
               </View>
-              <View className={`flex flex-row w-full mt-2 ${selectedPerson === -1 ? 'hidden' : ''}`}>
+              <View
+                className={`flex flex-row w-full mt-2 ${
+                  selectedPerson === -1 ? 'hidden' : ''
+                }`}>
                 <TextInput
                   placeholder=" Price"
                   onChangeText={text => setPrice(text)}
@@ -196,20 +207,22 @@ function App(): React.JSX.Element {
                   value={price}
                 />
                 <View className="">
-                <TouchableOpacity
-                className="my-auto ml-2"
-                  activeOpacity={0.6}
-                  onPress={() => handleAddPrice()}>
-                  <Text className="text-center bg-zinc-300 text-black rounded-2xl text-lg p-2">
-                    Add Price
-                  </Text>
-                </TouchableOpacity>
+                  <TouchableOpacity
+                    className="my-auto ml-2"
+                    activeOpacity={0.6}
+                    onPress={() => handleAddPrice()}>
+                    <Text className="text-center bg-zinc-300 text-black rounded-2xl text-lg p-2">
+                      Add Price
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>
           </View>
         )}
-        <View className={`items-center p-4 ${person.length > 0 ? '' : 'hidden'}`} style={colorScheme == 'light'? cardStyle : darkCardStyle}>
+        <View
+          className={`items-center p-4 ${person.length > 0 ? '' : 'hidden'}`}
+          style={colorScheme == 'light' ? cardStyle : darkCardStyle}>
           <View className="flex flex-col my-1 w-full">
             <TextInput
               placeholder=" Tips/Fees"
@@ -239,9 +252,7 @@ function App(): React.JSX.Element {
             ))}
           </View>
         </View>
-        <View className="h-16">
-
-        </View>
+        <View className="h-16"></View>
       </ScrollView>
     </View>
   );
