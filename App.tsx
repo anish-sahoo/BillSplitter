@@ -227,13 +227,13 @@ function App(): React.JSX.Element {
             <TextInput
               style={{paddingHorizontal: 10, paddingVertical: 5}}
               placeholder=" Tips/Fees"
-              className="w-3/5 mx-auto my-1 bg-zinc-100 dark:bg-zinc-600 rounded-2xl px-4 py-2 dark:text-white"
+              className="w-3/5 mx-auto my-1 bg-zinc-100 dark:bg-zinc-600 rounded-2xl p-4 dark:text-white"
               onChangeText={text => setFeesTips(parseFloat(text) || 0)}
             />
             <TextInput
               style={{paddingHorizontal: 10, paddingVertical: 5}}
               placeholder=" Tax %"
-              className="w-3/5 mx-auto my-1 bg-zinc-100 dark:bg-zinc-600 rounded-2xl px-4 py-2 dark:text-white"
+              className="w-3/5 mx-auto my-1 bg-zinc-100 dark:bg-zinc-600 rounded-2xl p-4 dark:text-white"
               onChangeText={text => setTax(parseFloat(text) || 0)}
             />
           </View>
