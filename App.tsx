@@ -163,7 +163,7 @@ function App(): React.JSX.Element {
                           );
                           setPerson(newPerson);
                         }}>
-                        <Text className="text-black dark:text-white text-lg">
+                        <Text className="text-black text-lg">
                           x
                         </Text>
                       </TouchableOpacity>
@@ -225,13 +225,15 @@ function App(): React.JSX.Element {
           style={colorScheme == 'light' ? cardStyle : darkCardStyle}>
           <View className="flex flex-col my-1 w-full">
             <TextInput
+              style={{paddingHorizontal: 10, paddingVertical: 5}}
               placeholder=" Tips/Fees"
-              className="w-3/5 mx-auto my-1 bg-zinc-100 dark:bg-zinc-600 rounded-2xl px-4 py-2"
+              className="w-3/5 mx-auto my-1 bg-zinc-100 dark:bg-zinc-600 rounded-2xl px-4 py-2 dark:text-white"
               onChangeText={text => setFeesTips(parseFloat(text) || 0)}
             />
             <TextInput
+              style={{paddingHorizontal: 10, paddingVertical: 5}}
               placeholder=" Tax %"
-              className="w-3/5 mx-auto my-1 bg-zinc-100 dark:bg-zinc-600 rounded-2xl px-4 py-2"
+              className="w-3/5 mx-auto my-1 bg-zinc-100 dark:bg-zinc-600 rounded-2xl px-4 py-2 dark:text-white"
               onChangeText={text => setTax(parseFloat(text) || 0)}
             />
           </View>
