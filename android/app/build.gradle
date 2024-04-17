@@ -74,9 +74,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.billsplitter"
+    namespace "com.sahooapps.billsplitter"
     defaultConfig {
-        applicationId "com.billsplitter"
+        applicationId "com.sahooapps.billsplitter"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

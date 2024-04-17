@@ -1,4 +1,4 @@
-package com.billsplitter
+package com.sahooapps.billsplitter
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

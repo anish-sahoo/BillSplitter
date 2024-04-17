@@ -1,4 +1,4 @@
-package com.billsplitter
+package com.sahooapps.billsplitter
 
 import android.app.Application
 import com.facebook.react.PackageList
