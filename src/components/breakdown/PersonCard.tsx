@@ -1,4 +1,4 @@
-import type { BillStore } from "../../store/BillStore";
+import type { PersonShare } from "../../lib/calc";
 import type { Person } from "../../types";
 import { colorBg } from "../../utils/color";
 import { fmt } from "../../utils/format";
@@ -7,17 +7,20 @@ import { Avatar } from "../ui/Avatar";
 export function PersonCard({
   person,
   color,
-  store,
+  share,
+  paidCents,
 }: {
   person: Person;
   color: string;
-  store: BillStore;
+  share: PersonShare | undefined;
+  paidCents: number;
 }) {
-  const items = store.itemsForPerson(person.id);
-  const subtotal = store.personSubtotal(person.id);
-  const taxShare = store.personTaxShare(person.id);
-  const tipShare = store.personTipShare(person.id);
-  const total = store.personTotal(person.id);
+  const items = share?.items ?? [];
+  const subtotal = (share?.subtotalCents ?? 0) / 100;
+  const taxShare = (share?.taxCents ?? 0) / 100;
+  const tipShare = (share?.tipCents ?? 0) / 100;
+  const total = (share?.totalCents ?? 0) / 100;
+  const paid = paidCents / 100;
   const hasAddons = taxShare > 0 || tipShare > 0;
 
   return (
@@ -44,9 +47,8 @@ export function PersonCard({
       {/* Items list */}
       {items.length > 0 && (
         <div className="px-3.5 pb-2.5 space-y-1 border-t border-zinc-100 dark:border-zinc-800 pt-2.5">
-          {items.map((item) => {
-            const n = store.splitsForItem(item.id).length;
-            const share = n > 0 ? item.cost / n : 0;
+          {items.map(({ item, cents, splitCount: n }) => {
+            const share = cents / 100;
             return (
               <div key={item.id} className="flex justify-between items-baseline gap-2">
                 <span className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
@@ -68,12 +70,17 @@ export function PersonCard({
         </p>
       )}
 
-      {/* Tax / tip footer */}
-      {items.length > 0 && hasAddons && (
+      {/* Tax / tip / paid footer */}
+      {((items.length > 0 && hasAddons) || paid > 0) && (
         <div className="px-3.5 py-2 border-t border-zinc-100 dark:border-zinc-800 space-y-0.5 mt-auto">
-          <AddonRow label="Subtotal" value={`$${fmt(subtotal)}`} />
-          {taxShare > 0 && <AddonRow label="Tax" value={`+$${fmt(taxShare)}`} />}
-          {tipShare > 0 && <AddonRow label="Tip" value={`+$${fmt(tipShare)}`} />}
+          {items.length > 0 && hasAddons && (
+            <>
+              <AddonRow label="Subtotal" value={`$${fmt(subtotal)}`} />
+              {taxShare > 0 && <AddonRow label="Tax" value={`+$${fmt(taxShare)}`} />}
+              {tipShare > 0 && <AddonRow label="Tip" value={`+$${fmt(tipShare)}`} />}
+            </>
+          )}
+          {paid > 0 && <AddonRow label="Paid" value={`$${fmt(paid)}`} />}
         </div>
       )}
     </div>

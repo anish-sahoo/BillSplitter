@@ -16,7 +16,9 @@ export function PersonSelector({
   return (
     <button
       onClick={onToggle}
-      className="flex items-center gap-2 max-w-full min-h-[44px] px-3 py-2 rounded-xl border text-sm font-medium transition-all duration-150"
+      className={`flex items-center gap-2 max-w-full min-h-[44px] px-3 py-2 rounded-xl border text-sm font-medium transition-all duration-150 ${
+        selected ? "" : "text-zinc-700 dark:text-zinc-200"
+      }`}
       style={
         selected
           ? {
@@ -28,7 +30,6 @@ export function PersonSelector({
           : {
               backgroundColor: colorBg(color, 0.05),
               borderColor: colorBg(color, 0.3),
-              color: "inherit",
             }
       }
     >

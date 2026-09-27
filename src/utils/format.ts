@@ -12,3 +12,7 @@ export function initials(name: string): string {
   if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
   return name.substring(0, 2).toUpperCase();
 }
+
+export function billLabel(bill: { title: string }): string {
+  return bill.title.trim() || "Untitled bill";
+}

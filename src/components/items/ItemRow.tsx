@@ -24,19 +24,17 @@ export function ItemRow({
   someSelectedOn,
   onToggleAssignment,
   onUnlink,
-  onToggleTaxExempt,
   onRemove,
 }: {
   item: Item;
   assignees: Person[];
-  colorFor: (personId: number) => string;
+  colorFor: (personId: string) => string;
   /** True when at least one person is selected, so the row acts as a checkbox */
   clickable: boolean;
   allSelectedOn: boolean;
   someSelectedOn: boolean;
   onToggleAssignment: () => void;
-  onUnlink: (personId: number) => void;
-  onToggleTaxExempt: () => void;
+  onUnlink: (personId: string) => void;
   onRemove: () => void;
 }) {
   return (
@@ -81,19 +79,14 @@ export function ItemRow({
           </div>
         )}
 
-        {/* Name + qty + tax badge */}
+        {/* Name + qty */}
         <div className="flex-1 min-w-0 flex items-center gap-2">
           <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
             {item.name || "Item"}
           </span>
           {item.quantity > 1 && (
             <span className="flex-shrink-0 text-[10px] font-medium text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-700 px-1.5 py-0.5 rounded-full tabular-nums">
-              ×{item.quantity} @ ${fmt(item.cost / item.quantity)}
-            </span>
-          )}
-          {item.taxExempt && (
-            <span className="flex-shrink-0 text-[10px] font-medium text-zinc-400 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded-full">
-              no tax
+              ×{item.quantity} @ ${fmt(item.costCents / item.quantity / 100)}
             </span>
           )}
         </div>
@@ -125,22 +118,11 @@ export function ItemRow({
 
       {/* Price */}
       <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tabular-nums flex-shrink-0 ml-auto sm:ml-0">
-        ${fmt(item.cost)}
+        ${fmt(item.costCents / 100)}
       </span>
 
       {/* Actions */}
       <div className="flex items-center gap-1 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-        <button
-          onClick={onToggleTaxExempt}
-          title={item.taxExempt ? "Mark as taxable" : "Mark as tax-exempt"}
-          className={`${ACTION_BUTTON} text-xs font-bold ${
-            item.taxExempt
-              ? "text-zinc-900 dark:text-zinc-100 bg-zinc-200 dark:bg-zinc-700"
-              : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-          }`}
-        >
-          %
-        </button>
         <button
           onClick={onRemove}
           title={`Remove ${item.name || "item"}`}

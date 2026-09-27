@@ -14,10 +14,10 @@ export function PeopleSection({
   onToggleSelect,
 }: {
   persons: Person[];
-  selectedIds: Set<number>;
+  selectedIds: Set<string>;
   onAdd: (name: string) => void;
-  onRemove: (id: number) => void;
-  onToggleSelect: (id: number) => void;
+  onRemove: (id: string) => void;
+  onToggleSelect: (id: string) => void;
 }) {
   const [name, setName] = useState("");
 
