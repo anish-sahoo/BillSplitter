@@ -1,11 +1,12 @@
-// Muted, hand-picked hues — distinct without being garish
+// Mid-tone pastels that sit well on both the dawn and dusk skies and still
+// carry white initials on avatars.
 export const PERSON_COLORS = [
-  "#6272a0", // slate indigo
-  "#b56d4a", // terracotta
-  "#4d8b6a", // sage
-  "#7a5f8a", // dusty plum
-  "#4a7ea8", // steel blue
-  "#9e7c40", // warm ochre
-  "#3d8282", // deep teal
-  "#8a5050", // muted burgundy
+  "#ef7b6e", // coral
+  "#6fa8f5", // sky
+  "#5dbb8a", // mint
+  "#a98bf0", // lilac
+  "#f0a45d", // apricot
+  "#ee7fae", // rose
+  "#45b8b0", // teal
+  "#d9a53f", // gold
 ];

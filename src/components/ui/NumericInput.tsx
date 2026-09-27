@@ -54,7 +54,7 @@ export function NumericInput({
         }}
         onBlur={() => setDraft(null)}
         placeholder={placeholder}
-        className={`w-full h-11 sm:h-9 text-base sm:text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 transition-shadow tabular-nums ${
+        className={`w-full h-11 sm:h-9 text-base sm:text-sm rounded-lg border border-black/10 dark:border-white/15 bg-white/70 dark:bg-white/10 text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white/70 transition-shadow tabular-nums ${
           prefix ? "pl-7" : "pl-3"
         } ${suffix ? "pr-8" : "pr-3"}`}
       />

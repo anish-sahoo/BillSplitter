@@ -22,6 +22,7 @@ function db(): Promise<IDBPDatabase<BillSplitterDb>> {
       store.createIndex("byUpdatedAt", "updatedAt");
     },
   });
+
   return dbPromise;
 }
 
@@ -38,24 +39,26 @@ export function newReceipt(paidBy: string | null): Receipt {
   };
 }
 
-// Stored data can be stale or hand-edited in devtools, so anything that
-// doesn't match the current shape is treated as missing.
-function parseBill(value: unknown): Bill | undefined {
-  const result = billSchema.safeParse(value);
-  return result.success ? result.data : undefined;
-}
+// Stored data can be stale or hand-edited in devtools, so every read is run
+// through the schema and anything that doesn't match is treated as missing.
 
 // Most recently edited first
 export async function listBills(): Promise<Bill[]> {
   const stored = await (await db()).getAllFromIndex("bills", "byUpdatedAt");
+
   return stored
-    .map(parseBill)
-    .filter((bill): bill is Bill => bill !== undefined)
+    .flatMap((raw) => {
+      const result = billSchema.safeParse(raw);
+
+      return result.success ? [result.data] : [];
+    })
     .reverse();
 }
 
 export async function getBill(id: string): Promise<Bill | undefined> {
-  return parseBill(await (await db()).get("bills", id));
+  const result = billSchema.safeParse(await (await db()).get("bills", id));
+
+  return result.success ? result.data : undefined;
 }
 
 export async function saveBill(bill: Bill): Promise<void> {
@@ -68,6 +71,7 @@ export async function deleteBill(id: string): Promise<void> {
 
 export async function createBill(): Promise<Bill> {
   const now = Date.now();
+
   const bill: Bill = {
     id: createId(),
     title: "",
@@ -76,8 +80,10 @@ export async function createBill(): Promise<Bill> {
     createdAt: now,
     updatedAt: now,
   };
+
   await saveBill(bill);
   // Ask the browser not to evict our data under storage pressure. Safari mostly ignores this.
   void navigator.storage?.persist?.();
+
   return bill;
 }

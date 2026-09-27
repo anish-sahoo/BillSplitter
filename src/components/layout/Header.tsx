@@ -1,70 +1,71 @@
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { SNAPPY, TAP } from "../../constants/motion";
+import { useTheme, type ThemeName } from "../../hooks/useTheme";
+import { ThemeMenu } from "./ThemeMenu";
 
-const HEADER_BUTTON = "text-xs font-medium transition-colors px-1 py-2";
+const PILL = "h-9 px-4 rounded-full text-[13px] font-medium transition-colors";
+
+const GLASS_BAR =
+  "rounded-full border border-white/60 dark:border-white/10 bg-white/60 dark:bg-[#0a0f2a]/55 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_12px_40px_-16px_rgba(0,0,0,0.35)]";
+
+const FLAT_BAR =
+  "rounded-full border border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm";
 
 export function Header({
-  dark,
-  onToggleDark,
+  onThemeChange,
   crumb,
-  onDelete,
   onShare,
   shareLabel = "Share",
 }: {
-  dark: boolean;
-  onToggleDark: () => void;
-  /** Current page after "Bills" in the breadcrumb; omitted on the bills page itself */
+  onThemeChange: (theme: ThemeName) => void;
+  /** Current bill after the brand in the breadcrumb; omitted on the bills page */
   crumb?: string;
-  onDelete?: () => void;
   onShare?: () => void;
   shareLabel?: string;
 }) {
+  const { flat } = useTheme();
+
   return (
-    <header className="sticky top-0 z-20 bg-zinc-50/90 dark:bg-zinc-950/90 backdrop-blur-sm border-b border-zinc-200 dark:border-zinc-800">
-      <div className="max-w-2xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-3">
-        {crumb === undefined ? (
-          <span className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 truncate">
+    <header className="sticky top-0 z-30 px-3 sm:px-6 pt-3">
+      <div
+        className={`max-w-7xl mx-auto h-14 pl-5 pr-2 flex items-center justify-between gap-3 ${flat ? FLAT_BAR : GLASS_BAR}`}
+      >
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2.5 min-w-0">
+          <Link
+            to="/"
+            className="font-serif text-[22px] leading-none text-zinc-900 dark:text-white flex-shrink-0 hover:opacity-70 transition-opacity"
+          >
             Bill Splitter
-          </span>
-        ) : (
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 min-w-0 text-base">
-            <Link
-              to="/"
-              className="font-semibold tracking-tight text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors flex-shrink-0"
-            >
-              Bills
-            </Link>
-            <span className="text-zinc-300 dark:text-zinc-600 flex-shrink-0">/</span>
-            <span
-              aria-current="page"
-              className="font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 truncate"
-            >
-              {crumb}
-            </span>
-          </nav>
-        )}
-        <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
-          {onDelete && (
-            <button
-              onClick={onDelete}
-              className={`${HEADER_BUTTON} text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300`}
-            >
-              Delete
-            </button>
+          </Link>
+          {crumb !== undefined && (
+            <>
+              {/* Hidden on phones: the hero card right below already shows the name */}
+              <span className="hidden sm:inline text-zinc-400 dark:text-white/30 flex-shrink-0">
+                /
+              </span>
+              <span
+                aria-current="page"
+                className="hidden sm:inline text-sm font-medium text-zinc-600 dark:text-white/70 truncate"
+              >
+                {crumb}
+              </span>
+            </>
           )}
+        </nav>
+
+        <div className="flex items-center gap-1 flex-shrink-0">
           {onShare && (
-            <button
+            <motion.button
+              whileTap={TAP}
+              transition={SNAPPY}
               onClick={onShare}
-              className={`${HEADER_BUTTON} text-zinc-900 hover:text-zinc-600 dark:text-zinc-100 dark:hover:text-zinc-300`}
+              className={`${PILL} bg-zinc-900 text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-white/85`}
             >
               {shareLabel}
-            </button>
+            </motion.button>
           )}
-          <button
-            onClick={onToggleDark}
-            className={`${HEADER_BUTTON} text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200`}
-          >
-            {dark ? "Light" : "Dark"}
-          </button>
+          <ThemeMenu onChange={onThemeChange} />
         </div>
       </div>
     </header>

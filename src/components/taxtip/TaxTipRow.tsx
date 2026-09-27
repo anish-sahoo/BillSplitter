@@ -36,7 +36,7 @@ export function TaxTipRow({
   return (
     <div className="space-y-2.5">
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{label}</label>
+        <label className="text-sm font-medium text-zinc-700 dark:text-white/80">{label}</label>
         <SplitModeToggle value={mode} onChange={onModeChange} />
       </div>
       <div className="flex items-center gap-2">
@@ -48,7 +48,7 @@ export function TaxTipRow({
           placeholder="0"
           suffix="%"
         />
-        <span className="text-zinc-300 dark:text-zinc-600 text-sm select-none flex-shrink-0">
+        <span className="text-zinc-300 dark:text-white/30 text-sm select-none flex-shrink-0">
           =
         </span>
         <NumericInput

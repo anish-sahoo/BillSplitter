@@ -4,5 +4,6 @@ const ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz";
 // plenty for IDs that only need to be unique within one browser's bills.
 export function createId(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(10));
+
   return Array.from(bytes, (b) => ALPHABET[b % ALPHABET.length]).join("");
 }

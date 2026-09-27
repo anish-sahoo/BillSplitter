@@ -1,4 +1,8 @@
-import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { BOUNCY } from "../constants/motion";
+import { restingTilt } from "../utils/crisp";
+import { useTheme } from "../hooks/useTheme";
 import { useLocation } from "react-router-dom";
 import { billTotals } from "../lib/calc";
 import { decodeBill } from "../lib/shareLink";
@@ -34,7 +38,7 @@ function Receipt({ bill }: { bill: Bill }) {
 
   return (
     <div className="font-mono text-[13px] leading-relaxed text-zinc-900">
-      <div className="bg-white px-5 pt-6 pb-4 shadow-sm">
+      <div className="bg-white px-5 pt-6 pb-4">
         <div className="text-center space-y-1">
           <p className="text-[11px] tracking-[0.3em] text-zinc-500">BILL SPLITTER</p>
           <h1 className="text-lg font-bold uppercase break-words">{billLabel(bill)}</h1>
@@ -49,7 +53,9 @@ function Receipt({ bill }: { bill: Bill }) {
 
         {bill.receipts.map((receipt, i) => {
           const r = totals.receipts.get(receipt.id);
+
           if (!r || receipt.items.length === 0) return null;
+
           return (
             <section key={receipt.id}>
               <Divider />
@@ -137,6 +143,7 @@ function Receipt({ bill }: { bill: Bill }) {
 
 export function ReceiptView() {
   const { hash } = useLocation();
+  const { flat } = useTheme();
   // undefined while decoding, null when the link can't be read
   const [bill, setBill] = useState<Bill | null | undefined>(undefined);
 
@@ -145,26 +152,67 @@ export function ReceiptView() {
     decodeBill(hash.slice(1)).then((decoded) => {
       if (!cancelled) setBill(decoded);
     });
+
     return () => {
       cancelled = true;
     };
   }, [hash]);
 
+  // Print just the receipt: size the page to the paper and drop the margins,
+  // which also makes browsers leave out their date/URL headers and footers.
+  // Runs for the button and for Ctrl/Cmd+P alike.
+  const paper = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const style = document.createElement("style");
+
+    const beforePrint = () => {
+      const el = paper.current;
+
+      if (!el) return;
+      const toMm = (px: number) => ((px * 25.4) / 96).toFixed(2);
+      style.textContent = `@page { size: ${toMm(el.offsetWidth)}mm ${toMm(el.offsetHeight + 2)}mm; margin: 0; }`;
+      document.head.appendChild(style);
+    };
+
+    const afterPrint = () => style.remove();
+    window.addEventListener("beforeprint", beforePrint);
+    window.addEventListener("afterprint", afterPrint);
+
+    return () => {
+      window.removeEventListener("beforeprint", beforePrint);
+      window.removeEventListener("afterprint", afterPrint);
+      style.remove();
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen bg-zinc-200 px-4 py-8 print:bg-white print:p-0">
+    <div className="min-h-screen px-4 py-10 print:bg-white print:p-0">
       <div className="max-w-sm mx-auto">
-        {bill === undefined && <p className="text-center text-sm text-zinc-500">Loading…</p>}
+        {bill === undefined && (
+          <p className="text-center text-sm text-zinc-500 dark:text-white/60">Loading…</p>
+        )}
         {bill === null && (
-          <p className="text-center text-sm text-zinc-600">
+          <p className="text-center text-sm text-zinc-600 dark:text-white/70">
             This link is incomplete or invalid. Ask for the link again.
           </p>
         )}
         {bill && (
           <>
-            <Receipt bill={bill} />
+            {/* The paper drops in and settles, like it was just torn off */}
+            <motion.div
+              initial={{ opacity: 0, y: flat ? 12 : -60, rotate: flat ? 0 : -4 }}
+              animate={{ opacity: 1, y: 0, rotate: flat ? 0 : restingTilt(-0.6) }}
+              whileHover={flat ? undefined : { rotate: 0, y: -4 }}
+              transition={BOUNCY}
+              className="drop-shadow-2xl print:drop-shadow-none print:!transform-none"
+            >
+              <div ref={paper}>
+                <Receipt bill={bill} />
+              </div>
+            </motion.div>
             <button
               onClick={() => window.print()}
-              className="mt-6 w-full text-xs font-medium text-zinc-500 hover:text-zinc-800 print:hidden"
+              className="mt-8 w-full text-xs font-semibold text-zinc-600 hover:text-zinc-900 dark:text-white/70 dark:hover:text-white print:hidden"
             >
               Print / Save as PDF
             </button>

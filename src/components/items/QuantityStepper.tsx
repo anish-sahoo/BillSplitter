@@ -1,7 +1,7 @@
 import { sanitizeDigits } from "../../utils/numeric";
 
 const STEP_BUTTON =
-  "w-9 sm:w-7 h-full flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors text-lg sm:text-base leading-none select-none";
+  "w-9 sm:w-7 h-full flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-white/90 hover:bg-white/60 dark:hover:bg-white/15 transition-colors text-lg sm:text-base leading-none select-none";
 
 export function QuantityStepper({
   value,
@@ -16,7 +16,7 @@ export function QuantityStepper({
   const current = () => parseInt(value, 10) || 1;
 
   return (
-    <div className="flex items-center h-11 sm:h-9 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 overflow-hidden flex-shrink-0">
+    <div className="flex items-center h-11 sm:h-9 rounded-lg border border-black/10 dark:border-white/15 bg-white/70 dark:bg-white/10 overflow-hidden flex-shrink-0">
       <button
         type="button"
         aria-label="Decrease quantity"
@@ -33,7 +33,7 @@ export function QuantityStepper({
         onChange={(e) => onChange(sanitizeDigits(e.target.value))}
         onBlur={() => onChange(String(Math.max(1, current())))}
         onKeyDown={(e) => e.key === "Enter" && onEnter?.()}
-        className="w-9 sm:w-8 h-full text-center text-base sm:text-sm bg-transparent text-zinc-900 dark:text-zinc-100 focus:outline-none tabular-nums"
+        className="w-9 sm:w-8 h-full text-center text-base sm:text-sm bg-transparent text-zinc-900 dark:text-white focus:outline-none tabular-nums"
       />
       <button
         type="button"

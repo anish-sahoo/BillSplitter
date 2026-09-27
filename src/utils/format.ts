@@ -9,10 +9,16 @@ export function trim(n: number): string {
 
 export function initials(name: string): string {
   const parts = name.trim().split(/\s+/);
+
   if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+
   return name.substring(0, 2).toUpperCase();
 }
 
 export function billLabel(bill: { title: string }): string {
   return bill.title.trim() || "Untitled bill";
+}
+
+export function plural(n: number, one: string, many = `${one}s`): string {
+  return `${n} ${n === 1 ? one : many}`;
 }

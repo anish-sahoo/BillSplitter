@@ -5,6 +5,7 @@ import { deleteBill, getBill, saveBill } from "./billStore";
 // made up.
 
 const ALL_SUPPLIES = ["anish", "rohanp", "rohanm", "will"];
+
 const ALL_RIDES = ["anish", "sean", "rohanm", "zayj"];
 
 function item(
@@ -72,5 +73,6 @@ const SEED_BILL: Bill = {
 export async function seedSampleBill(): Promise<void> {
   // Replaced by the current sample; drop it from browsers that loaded it
   await deleteBill("seed-apartment");
+
   if (!(await getBill(SEED_BILL.id))) await saveBill(SEED_BILL);
 }

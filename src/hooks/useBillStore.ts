@@ -41,6 +41,7 @@ export function useBillStore(billId: string): BillStore | null | undefined {
     getBill(billId).then((loaded) => {
       if (!cancelled) setBill(loaded ?? null);
     });
+
     return () => {
       cancelled = true;
     };
@@ -52,6 +53,7 @@ export function useBillStore(billId: string): BillStore | null | undefined {
 
   // Hide a previously loaded bill while the next one loads
   if (bill === undefined || (bill !== null && bill.id !== billId)) return undefined;
+
   if (bill === null) return null;
 
   const update = (change: (current: Bill) => Bill) => {
@@ -84,6 +86,7 @@ export function useBillStore(billId: string): BillStore | null | undefined {
     addPerson: (name) => {
       const trimmed = name.trim();
       const taken = bill.persons.some((p) => p.name.toLowerCase() === trimmed.toLowerCase());
+
       if (!trimmed || taken) return;
       const person = { id: createId(), name: trimmed };
       update((b) => ({
@@ -128,6 +131,7 @@ export function useBillStore(billId: string): BillStore | null | undefined {
     addItem: (receiptId, name, unitPrice, assignTo, quantity) => {
       if (isNaN(unitPrice) || unitPrice <= 0) return;
       const qty = Math.max(1, Math.round(quantity));
+
       const item = {
         id: createId(),
         name: name.trim(),
@@ -135,6 +139,7 @@ export function useBillStore(billId: string): BillStore | null | undefined {
         quantity: qty,
         personIds: assignTo,
       };
+
       updateReceipt(receiptId, (r) => ({ ...r, items: [...r.items, item] }));
     },
 
@@ -144,6 +149,7 @@ export function useBillStore(billId: string): BillStore | null | undefined {
     setItemSplit: (receiptId, itemId, personId, included) =>
       updateItemPeople(receiptId, itemId, (ids) => {
         const without = ids.filter((id) => id !== personId);
+
         return included ? [...without, personId] : without;
       }),
 

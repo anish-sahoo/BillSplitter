@@ -6,13 +6,17 @@ const ACTION_BUTTON =
   "w-8 h-8 sm:w-6 sm:h-6 rounded-md flex items-center justify-center transition-colors";
 
 function rowBorder(clickable: boolean, all: boolean, some: boolean): string {
-  if (!clickable) return "border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900";
-  if (all) return "border-zinc-400 dark:border-zinc-500 bg-zinc-50 dark:bg-zinc-800 cursor-pointer";
+  if (!clickable) return "border-black/5 dark:border-white/10 bg-white/70 dark:bg-white/[0.06]";
+
+  if (all)
+    return "border-black/25 dark:border-white/35 bg-white/50 dark:bg-white/10 cursor-pointer";
+
   const hover =
-    "bg-white dark:bg-zinc-900 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/60";
+    "bg-white/70 dark:bg-white/[0.06] cursor-pointer hover:bg-white/60 dark:hover:bg-white/10";
+
   return some
-    ? `border-zinc-300 dark:border-zinc-600 ${hover}`
-    : `border-zinc-200 dark:border-zinc-700 ${hover}`;
+    ? `border-black/15 dark:border-white/25 ${hover}`
+    : `border-black/10 dark:border-white/15 ${hover}`;
 }
 
 export function ItemRow({
@@ -52,10 +56,10 @@ export function ItemRow({
           <div
             className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
               allSelectedOn
-                ? "bg-zinc-900 dark:bg-zinc-100 border-zinc-900 dark:border-zinc-100"
+                ? "bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white"
                 : someSelectedOn
-                  ? "border-zinc-400 dark:border-zinc-500 bg-white dark:bg-zinc-900"
-                  : "border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900"
+                  ? "border-black/25 dark:border-white/35 bg-white/70 dark:bg-white/[0.06]"
+                  : "border-black/15 dark:border-white/25 bg-white/70 dark:bg-white/[0.06]"
             }`}
           >
             {allSelectedOn && (
@@ -81,11 +85,11 @@ export function ItemRow({
 
         {/* Name + qty */}
         <div className="flex-1 min-w-0 flex items-center gap-2">
-          <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
+          <span className="text-sm font-medium text-zinc-900 dark:text-white truncate">
             {item.name || "Item"}
           </span>
           {item.quantity > 1 && (
-            <span className="flex-shrink-0 text-[10px] font-medium text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-700 px-1.5 py-0.5 rounded-full tabular-nums">
+            <span className="flex-shrink-0 text-[10px] font-medium text-zinc-500 dark:text-white/60 bg-black/5 dark:bg-white/15 px-1.5 py-0.5 rounded-full tabular-nums">
               ×{item.quantity} @ ${fmt(item.costCents / item.quantity / 100)}
             </span>
           )}
@@ -112,12 +116,12 @@ export function ItemRow({
           </button>
         ))}
         {assignees.length === 0 && (
-          <span className="text-xs text-zinc-300 dark:text-zinc-600 italic">unassigned</span>
+          <span className="text-xs text-zinc-300 dark:text-white/30 italic">unassigned</span>
         )}
       </div>
 
       {/* Price */}
-      <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 tabular-nums flex-shrink-0 ml-auto sm:ml-0">
+      <span className="text-sm font-semibold text-zinc-900 dark:text-white tabular-nums flex-shrink-0 ml-auto sm:ml-0">
         ${fmt(item.costCents / 100)}
       </span>
 
@@ -126,7 +130,7 @@ export function ItemRow({
         <button
           onClick={onRemove}
           title={`Remove ${item.name || "item"}`}
-          className={`${ACTION_BUTTON} text-zinc-400 dark:text-zinc-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30`}
+          className={`${ACTION_BUTTON} text-zinc-400 dark:text-white/45 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30`}
         >
           <svg className="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none">
             <path

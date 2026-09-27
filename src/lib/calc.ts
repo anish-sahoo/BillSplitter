@@ -46,12 +46,15 @@ function percentOf(cents: number, percent: number): number {
 
 export function receiptTotals(receipt: Receipt): ReceiptTotals {
   const shares = new Map<string, PersonShare>();
+
   const shareFor = (personId: string) => {
     let share = shares.get(personId);
+
     if (!share) {
       share = emptyShare();
       shares.set(personId, share);
     }
+
     return share;
   };
 
@@ -60,18 +63,23 @@ export function receiptTotals(receipt: Receipt): ReceiptTotals {
 
   receipt.items.forEach((item, index) => {
     subtotalCents += item.costCents;
+
     if (item.personIds.length === 0) {
       unassignedCents += item.costCents;
+
       return;
     }
+
     // Leftover cents go to whoever is first, so rotate the order per item to
     // keep one person from collecting every extra cent.
     const offset = index % item.personIds.length;
     const rotated = [...item.personIds.slice(offset), ...item.personIds.slice(0, offset)];
+
     const split = allocateCents(
       item.costCents,
       rotated.map((id) => ({ id, weight: 1 })),
     );
+
     for (const [personId, cents] of split) {
       const share = shareFor(personId);
       share.items.push({
@@ -97,6 +105,7 @@ export function receiptTotals(receipt: Receipt): ReceiptTotals {
 
   for (const [id, cents] of allocateCents(taxCents, weights(receipt.taxMode)))
     shareFor(id).taxCents = cents;
+
   for (const [id, cents] of allocateCents(tipCents, weights(receipt.tipMode)))
     shareFor(id).tipCents = cents;
 
@@ -118,8 +127,7 @@ export function receiptTotals(receipt: Receipt): ReceiptTotals {
 export function settle(balances: Map<string, number>): Transfer[] {
   const byAmount = (sign: 1 | -1) =>
     [...balances]
-      .map(([id, cents]) => ({ id, cents: cents * sign }))
-      .filter((entry) => entry.cents > 0)
+      .flatMap(([id, cents]) => (cents * sign > 0 ? [{ id, cents: cents * sign }] : []))
       .sort((a, b) => b.cents - a.cents || a.id.localeCompare(b.id));
 
   const creditors = byAmount(1);
@@ -133,7 +141,9 @@ export function settle(balances: Map<string, number>): Transfer[] {
     transfers.push({ fromId: debtors[d].id, toId: creditors[c].id, cents });
     debtors[d].cents -= cents;
     creditors[c].cents -= cents;
+
     if (debtors[d].cents === 0) d++;
+
     if (creditors[c].cents === 0) c++;
   }
 
@@ -157,6 +167,7 @@ export function billTotals(bill: Bill): BillTotals {
 
     for (const [personId, share] of totals.shares) {
       const combined = shares.get(personId);
+
       if (!combined) continue;
       combined.items.push(...share.items);
       combined.subtotalCents += share.subtotalCents;
@@ -166,6 +177,7 @@ export function billTotals(bill: Bill): BillTotals {
     }
 
     const payerKnown = receipt.paidBy !== null && paidCents.has(receipt.paidBy);
+
     if (!payerKnown) {
       if (totals.totalCents > 0) receiptsWithoutPayer.push(receipt);
       continue;
@@ -176,6 +188,7 @@ export function billTotals(bill: Bill): BillTotals {
     const splitCents = [...totals.shares.values()].reduce((sum, s) => sum + s.totalCents, 0);
     paidCents.set(receipt.paidBy!, (paidCents.get(receipt.paidBy!) ?? 0) + totals.totalCents);
     balances.set(receipt.paidBy!, (balances.get(receipt.paidBy!) ?? 0) + splitCents);
+
     for (const [personId, share] of totals.shares)
       balances.set(personId, (balances.get(personId) ?? 0) - share.totalCents);
   }
