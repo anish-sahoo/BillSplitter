@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+import { BOUNCY } from "../../constants/motion";
 import type { Person } from "../../types";
 import { colorBg } from "../../utils/color";
 import { Avatar } from "../ui/Avatar";
@@ -12,7 +14,12 @@ export function PersonChip({
   onRemove: () => void;
 }) {
   return (
-    <span
+    <motion.span
+      layout
+      initial={{ opacity: 0, scale: 0.4 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.4 }}
+      transition={BOUNCY}
       className="inline-flex items-center gap-1.5 pl-1.5 pr-1 py-1 rounded-full text-xs font-medium max-w-full"
       style={{ backgroundColor: colorBg(color, 0.1), color }}
     >
@@ -32,6 +39,6 @@ export function PersonChip({
           />
         </svg>
       </button>
-    </span>
+    </motion.span>
   );
 }

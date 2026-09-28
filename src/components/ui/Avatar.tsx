@@ -14,6 +14,7 @@ export function Avatar({
   single?: boolean;
 }) {
   const label = initials(name);
+
   return (
     <span
       className={`rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 ${className}`}

@@ -1,35 +1,68 @@
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { SNAPPY, TAP } from "../../constants/motion";
+import { useTheme, type ThemeName } from "../../hooks/useTheme";
+import { ThemeMenu } from "./ThemeMenu";
+
+const PILL = "h-9 px-3.5 sm:px-4 rounded-full text-[13px] font-medium transition-colors";
+
+const GLASS_BAR =
+  "rounded-full border border-white/60 dark:border-white/10 bg-white/60 dark:bg-[#0a0f2a]/55 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_12px_40px_-16px_rgba(0,0,0,0.35)]";
+
+const FLAT_BAR =
+  "rounded-full border border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm";
+
 export function Header({
-  dark,
-  onToggleDark,
-  showClear,
-  onClear,
+  onThemeChange,
+  crumb,
+  onShare,
+  shareLabel = "Share",
 }: {
-  dark: boolean;
-  onToggleDark: () => void;
-  showClear: boolean;
-  onClear: () => void;
+  onThemeChange: (theme: ThemeName) => void;
+  /** Current bill after the brand in the breadcrumb; omitted on the bills page */
+  crumb?: string;
+  onShare?: () => void;
+  shareLabel?: string;
 }) {
+  const { flat } = useTheme();
+
   return (
-    <header className="sticky top-0 z-20 bg-zinc-50/90 dark:bg-zinc-950/90 backdrop-blur-sm border-b border-zinc-200 dark:border-zinc-800">
-      <div className="max-w-2xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-3">
-        <span className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 truncate">
-          Bill Splitter
-        </span>
-        <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
-          {showClear && (
-            <button
-              onClick={onClear}
-              className="text-xs font-medium text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors px-1 py-2"
-            >
-              Clear all
-            </button>
-          )}
-          <button
-            onClick={onToggleDark}
-            className="text-xs font-medium text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors px-1 py-2"
+    <header className="sticky top-0 z-30 px-4 sm:px-6 pt-3">
+      <div
+        className={`max-w-7xl mx-auto h-14 pl-4 sm:pl-5 pr-2 flex items-center justify-between gap-3 ${flat ? FLAT_BAR : GLASS_BAR}`}
+      >
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2.5 min-w-0">
+          <Link
+            to="/"
+            className="font-serif text-xl sm:text-[22px] leading-none text-zinc-900 dark:text-white flex-shrink-0 hover:opacity-70 transition-opacity"
           >
-            {dark ? "Light" : "Dark"}
-          </button>
+            Bill Splitter
+          </Link>
+          {crumb !== undefined && (
+            <>
+              <span className="text-zinc-400 dark:text-white/30 flex-shrink-0">/</span>
+              <span
+                aria-current="page"
+                className="min-w-0 text-sm font-medium text-zinc-600 dark:text-white/70 truncate"
+              >
+                {crumb}
+              </span>
+            </>
+          )}
+        </nav>
+
+        <div className="flex items-center gap-1 flex-shrink-0">
+          {onShare && (
+            <motion.button
+              whileTap={TAP}
+              transition={SNAPPY}
+              onClick={onShare}
+              className={`${PILL} bg-zinc-900 text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-white/85`}
+            >
+              {shareLabel}
+            </motion.button>
+          )}
+          <ThemeMenu onChange={onThemeChange} />
         </div>
       </div>
     </header>

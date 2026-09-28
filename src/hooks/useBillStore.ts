@@ -1,231 +1,161 @@
 import { useEffect, useRef, useState } from "react";
-import type { Item, Person, Split, SplitMode } from "../types";
-import type { BillStore } from "../store/BillStore";
-import type { BillRepository } from "../store/BillRepository";
-import { LocalStorageRepository } from "../store/LocalStorageRepository";
+import { billTotals, type BillTotals } from "../lib/calc";
+import { getBill, newReceipt, saveBill } from "../lib/billStore";
+import { createId } from "../lib/ids";
+import type { Bill, Receipt, SplitMode } from "../types";
 
-const defaultRepo = new LocalStorageRepository();
+export interface BillStore {
+  bill: Bill;
+  totals: BillTotals;
+  setTitle: (title: string) => void;
+  addPerson: (name: string) => void;
+  removePerson: (personId: string) => void;
+  addReceipt: () => void;
+  removeReceipt: (receiptId: string) => void;
+  setReceiptName: (receiptId: string, name: string) => void;
+  setPaidBy: (receiptId: string, personId: string | null) => void;
+  addItem: (
+    receiptId: string,
+    name: string,
+    unitPrice: number,
+    assignTo: string[],
+    quantity: number,
+  ) => void;
+  removeItem: (receiptId: string, itemId: string) => void;
+  setItemSplit: (receiptId: string, itemId: string, personId: string, included: boolean) => void;
+  setTax: (receiptId: string, percent: number) => void;
+  setTaxMode: (receiptId: string, mode: SplitMode) => void;
+  setTip: (receiptId: string, percent: number) => void;
+  setTipMode: (receiptId: string, mode: SplitMode) => void;
+}
 
-export function useBillStore(repo: BillRepository = defaultRepo): BillStore {
-  const [persons, setPersons] = useState<Person[]>([]);
-  const [items, setItems] = useState<Item[]>([]);
-  const [splits, setSplits] = useState<Split[]>([]);
-  const [nameSet, setNameSet] = useState<Set<string>>(new Set());
-  const [tax, setTax] = useState(0);
-  const [taxMode, setTaxMode] = useState<SplitMode>("proportional");
-  const [tip, setTip] = useState(0);
-  const [tipMode, setTipMode] = useState<SplitMode>("even");
-  const [isLoading, setIsLoading] = useState(true);
-  const nextId = useRef(0);
-  const initialized = useRef(false);
-  const newId = () => nextId.current++;
+// Loads one bill from IndexedDB and saves it back after every edit.
+// `store` is undefined while loading and null if the bill doesn't exist.
+export function useBillStore(billId: string): BillStore | null | undefined {
+  const [bill, setBill] = useState<Bill | null | undefined>(undefined);
+  const edited = useRef(false);
 
-  // ── Persistence ───────────────────────────────────────────────────────────
-
-  // Load once on mount
   useEffect(() => {
-    repo.load().then((saved) => {
-      if (saved) {
-        setPersons(saved.persons);
-        // Backfill quantity for items persisted before this field existed
-        setItems(saved.items.map((i) => ({ ...i, quantity: i.quantity ?? 1 })));
-        setSplits(saved.splits);
-        setNameSet(new Set(saved.persons.map((p) => p.name.toLowerCase())));
-        setTax(saved.tax ?? 0);
-        setTaxMode(saved.taxMode ?? "proportional");
-        setTip(saved.tip ?? 0);
-        setTipMode(saved.tipMode ?? "even");
-        nextId.current = saved.nextId;
-      }
-      initialized.current = true;
-      setIsLoading(false);
+    let cancelled = false;
+    edited.current = false;
+    getBill(billId).then((loaded) => {
+      if (!cancelled) setBill(loaded ?? null);
     });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Save on every change after the initial load has settled
+    return () => {
+      cancelled = true;
+    };
+  }, [billId]);
+
   useEffect(() => {
-    if (!initialized.current) return;
-    repo
-      .save({ persons, items, splits, tax, taxMode, tip, tipMode, nextId: nextId.current })
-      .catch(console.error);
-  }, [persons, items, splits, tax, taxMode, tip, tipMode]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (bill && edited.current) saveBill(bill).catch(console.error);
+  }, [bill]);
 
-  // ── Queries ──────────────────────────────────────────────────────────────
+  // Hide a previously loaded bill while the next one loads
+  if (bill === undefined || (bill !== null && bill.id !== billId)) return undefined;
 
-  const splitsForItem = (itemId: number) => splits.filter((s) => s.itemId === itemId);
-  const splitsForPerson = (personId: number) => splits.filter((s) => s.personId === personId);
+  if (bill === null) return null;
 
-  const personsForItem = (itemId: number): Person[] =>
-    splitsForItem(itemId)
-      .map((s) => persons.find((p) => p.id === s.personId))
-      .filter(Boolean) as Person[];
-
-  const itemsForPerson = (personId: number): Item[] =>
-    splitsForPerson(personId)
-      .map((s) => items.find((i) => i.id === s.itemId))
-      .filter(Boolean) as Item[];
-
-  // ── People ────────────────────────────────────────────────────────────────
-
-  const addPerson = (name: string) => {
-    const trimmed = name.trim();
-    if (!trimmed || nameSet.has(trimmed.toLowerCase())) return;
-    setPersons((prev) => [...prev, { id: newId(), name: trimmed }]);
-    setNameSet((prev) => new Set([...prev, trimmed.toLowerCase()]));
+  const update = (change: (current: Bill) => Bill) => {
+    edited.current = true;
+    setBill((current) => (current ? { ...change(current), updatedAt: Date.now() } : current));
   };
 
-  const removePerson = (personId: number) => {
-    const person = persons.find((p) => p.id === personId);
-    if (!person) return;
+  const updateReceipt = (receiptId: string, change: (receipt: Receipt) => Receipt) =>
+    update((b) => ({
+      ...b,
+      receipts: b.receipts.map((r) => (r.id === receiptId ? change(r) : r)),
+    }));
 
-    const remainingSplits = splits.filter((s) => s.personId !== personId);
-    const usedItemIds = new Set(remainingSplits.map((s) => s.itemId));
-
-    setPersons((prev) => prev.filter((p) => p.id !== personId));
-    setNameSet((prev) => {
-      const s = new Set(prev);
-      s.delete(person.name.toLowerCase());
-      return s;
-    });
-    setSplits(remainingSplits);
-    // Only remove items that had splits and now have none left (keep unassigned items)
-    setItems((prev) =>
-      prev.filter((i) => {
-        const hadSplits = splits.some((s) => s.itemId === i.id);
-        return !hadSplits || usedItemIds.has(i.id);
-      }),
-    );
-  };
-
-  // ── Items ─────────────────────────────────────────────────────────────────
-
-  // assignTo may be empty — items can exist without any assignment
-  const addItem = (name: string, unitPrice: number, assignTo: number[], quantity = 1) => {
-    if (isNaN(unitPrice) || unitPrice <= 0) return;
-    const qty = Math.max(1, Math.round(quantity));
-    const cost = unitPrice * qty;
-    const itemId = newId();
-    setItems((prev) => [
-      ...prev,
-      { id: itemId, name: name.trim(), cost, quantity: qty, taxExempt: false },
-    ]);
-    if (assignTo.length > 0) {
-      setSplits((prev) => [...prev, ...assignTo.map((personId) => ({ itemId, personId }))]);
-    }
-  };
-
-  const removeItem = (itemId: number) => {
-    setItems((prev) => prev.filter((i) => i.id !== itemId));
-    setSplits((prev) => prev.filter((s) => s.itemId !== itemId));
-  };
-
-  const unlinkPerson = (itemId: number, personId: number) =>
-    setSplits((prev) => prev.filter((s) => !(s.itemId === itemId && s.personId === personId)));
-
-  const setItemSplit = (itemId: number, personId: number, included: boolean) => {
-    if (included) {
-      // Avoid duplicate splits
-      const exists = splits.some((s) => s.itemId === itemId && s.personId === personId);
-      if (!exists) setSplits((prev) => [...prev, { itemId, personId }]);
-    } else {
-      unlinkPerson(itemId, personId);
-    }
-  };
-
-  const toggleTaxExempt = (itemId: number) =>
-    setItems((prev) => prev.map((i) => (i.id === itemId ? { ...i, taxExempt: !i.taxExempt } : i)));
-
-  // ── Calculations ──────────────────────────────────────────────────────────
-
-  const personSubtotal = (personId: number): number =>
-    itemsForPerson(personId).reduce((sum, item) => {
-      const n = splitsForItem(item.id).length;
-      return sum + (n > 0 ? item.cost / n : 0);
-    }, 0);
-
-  const personTaxableSubtotal = (personId: number): number =>
-    itemsForPerson(personId).reduce((sum, item) => {
-      if (item.taxExempt) return sum;
-      const n = splitsForItem(item.id).length;
-      return sum + (n > 0 ? item.cost / n : 0);
-    }, 0);
-
-  const itemsTotal = items.filter((i) => !i.taxExempt).reduce((sum, i) => sum + i.cost, 0);
-  const allItemsCost = items.reduce((sum, i) => sum + i.cost, 0);
-  const taxAmount = itemsTotal * (tax / 100);
-  const tipAmount = allItemsCost * (tip / 100);
-
-  const personTaxShare = (personId: number): number => {
-    if (taxMode === "proportional") {
-      return personTaxableSubtotal(personId) * (tax / 100);
-    }
-    // even split
-    return persons.length > 0 ? taxAmount / persons.length : 0;
-  };
-
-  const personTipShare = (personId: number): number => {
-    if (tipMode === "proportional") {
-      if (allItemsCost <= 0) return persons.length > 0 ? tipAmount / persons.length : 0;
-      return (personSubtotal(personId) / allItemsCost) * tipAmount;
-    }
-    // even split
-    return persons.length > 0 ? tipAmount / persons.length : 0;
-  };
-
-  const personTotal = (personId: number): number =>
-    personSubtotal(personId) + personTaxShare(personId) + personTipShare(personId);
-
-  const grandTotal = persons.reduce((sum, p) => sum + personTotal(p.id), 0);
-
-  // ── Reset ─────────────────────────────────────────────────────────────────
-
-  const clearAll = () => {
-    setPersons([]);
-    setItems([]);
-    setSplits([]);
-    setNameSet(new Set());
-    setTax(0);
-    setTaxMode("proportional");
-    setTip(0);
-    setTipMode("even");
-    nextId.current = 0;
-    repo.clear().catch(console.error);
-  };
+  const updateItemPeople = (
+    receiptId: string,
+    itemId: string,
+    change: (personIds: string[]) => string[],
+  ) =>
+    updateReceipt(receiptId, (r) => ({
+      ...r,
+      items: r.items.map((i) => (i.id === itemId ? { ...i, personIds: change(i.personIds) } : i)),
+    }));
 
   return {
-    persons,
-    items,
-    splits,
-    tax,
-    setTax,
-    taxMode,
-    setTaxMode,
-    tip,
-    setTip,
-    tipMode,
-    setTipMode,
-    addPerson,
-    removePerson,
-    addItem,
-    removeItem,
-    unlinkPerson,
-    setItemSplit,
-    toggleTaxExempt,
-    splitsForItem,
-    splitsForPerson,
-    personsForItem,
-    itemsForPerson,
-    personSubtotal,
-    personTaxableSubtotal,
-    personTaxShare,
-    personTipShare,
-    personTotal,
-    grandTotal,
-    itemsTotal,
-    allItemsCost,
-    taxAmount,
-    tipAmount,
-    clearAll,
-    isLoading,
+    bill,
+    totals: billTotals(bill),
+
+    setTitle: (title) => update((b) => ({ ...b, title })),
+
+    addPerson: (name) => {
+      const trimmed = name.trim();
+      const taken = bill.persons.some((p) => p.name.toLowerCase() === trimmed.toLowerCase());
+
+      if (!trimmed || taken) return;
+      const person = { id: createId(), name: trimmed };
+      update((b) => ({
+        ...b,
+        persons: [...b.persons, person],
+        // The first person added becomes the payer of any receipt without one
+        receipts: b.receipts.map((r) => (r.paidBy ? r : { ...r, paidBy: person.id })),
+      }));
+    },
+
+    removePerson: (personId) =>
+      update((b) => ({
+        ...b,
+        persons: b.persons.filter((p) => p.id !== personId),
+        receipts: b.receipts.map((r) => ({
+          ...r,
+          paidBy: r.paidBy === personId ? null : r.paidBy,
+          items: r.items.map((i) => ({
+            ...i,
+            personIds: i.personIds.filter((id) => id !== personId),
+          })),
+        })),
+      })),
+
+    addReceipt: () =>
+      update((b) => ({
+        ...b,
+        receipts: [...b.receipts, newReceipt(b.persons[0]?.id ?? null)],
+      })),
+
+    removeReceipt: (receiptId) =>
+      update((b) =>
+        b.receipts.length > 1
+          ? { ...b, receipts: b.receipts.filter((r) => r.id !== receiptId) }
+          : b,
+      ),
+
+    setReceiptName: (receiptId, name) => updateReceipt(receiptId, (r) => ({ ...r, name })),
+
+    setPaidBy: (receiptId, paidBy) => updateReceipt(receiptId, (r) => ({ ...r, paidBy })),
+
+    addItem: (receiptId, name, unitPrice, assignTo, quantity) => {
+      if (isNaN(unitPrice) || unitPrice <= 0) return;
+      const qty = Math.max(1, Math.round(quantity));
+
+      const item = {
+        id: createId(),
+        name: name.trim(),
+        costCents: Math.round(unitPrice * 100) * qty,
+        quantity: qty,
+        personIds: assignTo,
+      };
+
+      updateReceipt(receiptId, (r) => ({ ...r, items: [...r.items, item] }));
+    },
+
+    removeItem: (receiptId, itemId) =>
+      updateReceipt(receiptId, (r) => ({ ...r, items: r.items.filter((i) => i.id !== itemId) })),
+
+    setItemSplit: (receiptId, itemId, personId, included) =>
+      updateItemPeople(receiptId, itemId, (ids) => {
+        const without = ids.filter((id) => id !== personId);
+
+        return included ? [...without, personId] : without;
+      }),
+
+    setTax: (receiptId, tax) => updateReceipt(receiptId, (r) => ({ ...r, tax })),
+    setTaxMode: (receiptId, taxMode) => updateReceipt(receiptId, (r) => ({ ...r, taxMode })),
+    setTip: (receiptId, tip) => updateReceipt(receiptId, (r) => ({ ...r, tip })),
+    setTipMode: (receiptId, tipMode) => updateReceipt(receiptId, (r) => ({ ...r, tipMode })),
   };
 }

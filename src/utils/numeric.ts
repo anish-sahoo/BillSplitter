@@ -6,7 +6,9 @@
 export function sanitizeDecimal(raw: string): string {
   let s = raw.replace(/[^\d.]/g, "");
   const dot = s.indexOf(".");
+
   if (dot !== -1) s = s.slice(0, dot + 1) + s.slice(dot + 1).replace(/\./g, "");
+
   return s;
 }
 
@@ -18,5 +20,6 @@ export function sanitizeDigits(raw: string): string {
 export function parseAmount(raw: string): number {
   if (raw === "" || raw === ".") return 0;
   const n = parseFloat(raw);
+
   return isNaN(n) ? 0 : n;
 }

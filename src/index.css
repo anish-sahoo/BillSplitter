@@ -1,3 +1,79 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans antialiased;
+    /* Full-bleed rows (the receipts carousel) can reach past the viewport */
+    overflow-x: clip;
+    font-feature-settings: "cv11", "ss01";
+  }
+}
+
+/* Horizontal scrollers keep swipe/trackpad scrolling but hide the bar */
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Dot-matrix screen texture over the painted scene */
+.scene-dots {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.5) 0.7px, transparent 1.1px);
+  background-size: 5px 5px;
+  mix-blend-mode: soft-light;
+  opacity: 0.55;
+}
+
+/* Static film grain from an SVG noise filter */
+.scene-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  opacity: 0.25;
+}
+
+/* Flat theme: plain v1-style type. Display text drops the serif for the UI
+   sans at a heavier weight. */
+.theme-flat .font-serif {
+  font-family: "Inter Variable", system-ui, sans-serif;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+}
+
+/* Flat theme paints the page itself, so overscroll and long pages match */
+html.theme-flat {
+  background-color: #fafafa;
+}
+html.theme-flat.dark {
+  background-color: #09090b;
+}
+
+/* Printing is paper-white whatever the theme */
+@media print {
+  html,
+  html.dark,
+  html.theme-flat {
+    background: white !important;
+  }
+}
+
+/* Receipts row: cards dissolve into the scenery at both screen edges instead
+   of being cut off. Tablet and up only; on phones the mask forces the row onto
+   a low-resolution layer and blurs the text, and the edges are tiny anyway. */
+@media (min-width: 640px) {
+  .edge-fade {
+    --fade: linear-gradient(
+      to right,
+      transparent,
+      #000 var(--pad),
+      #000 calc(100% - var(--pad)),
+      transparent
+    );
+    mask-image: var(--fade);
+    -webkit-mask-image: var(--fade);
+  }
+}

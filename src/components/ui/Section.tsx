@@ -1,24 +1,29 @@
 import type { ReactNode } from "react";
-import { CARD_CLASS } from "./styles";
+import { Card } from "../motion/Card";
+import { SUBTITLE_CLASS, TITLE_CLASS } from "./styles";
 
 // Card with a titled header. Children supply their own padding so sections can
 // run edge-to-edge content (grids, footers) when they need to.
 export function Section({
   title,
   subtitle,
+  delay,
+  lean,
   children,
 }: {
   title: string;
   subtitle?: string;
+  delay?: number;
+  lean?: boolean;
   children: ReactNode;
 }) {
   return (
-    <section className={CARD_CLASS}>
-      <div className="px-4 sm:px-5 pt-4 pb-3 border-b border-zinc-100 dark:border-zinc-800">
-        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{title}</h2>
-        {subtitle && <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">{subtitle}</p>}
+    <Card seed={title} delay={delay} lean={lean}>
+      <div className="px-5 pt-5 pb-3">
+        <h2 className={TITLE_CLASS}>{title}</h2>
+        {subtitle && <p className={`${SUBTITLE_CLASS} mt-2`}>{subtitle}</p>}
       </div>
       {children}
-    </section>
+    </Card>
   );
 }
