@@ -70,7 +70,7 @@ export function ReceiptSection({
   return (
     <Card seed={receipt.id} delay={0.1}>
       {/* Header: receipt name + running total */}
-      <div className="px-5 pt-5 pb-3 space-y-3">
+      <div className="px-4 sm:px-5 pt-5 pb-3 space-y-3">
         <div className="flex items-center gap-2">
           <input
             type="text"
@@ -79,11 +79,11 @@ export function ReceiptSection({
             placeholder={`Receipt ${index + 1}`}
             aria-label="Receipt name"
             autoComplete="off"
-            className={`flex-1 font-serif text-3xl ${HEADER_INPUT_CLASS}`}
+            className={`flex-1 font-serif text-2xl sm:text-3xl ${HEADER_INPUT_CLASS}`}
           />
           <AnimatedDollars
             cents={totals?.totalCents ?? 0}
-            className="font-serif text-3xl leading-none text-zinc-900 dark:text-white"
+            className="font-serif text-2xl sm:text-3xl leading-none text-zinc-900 dark:text-white"
           />
         </div>
 
@@ -120,7 +120,7 @@ export function ReceiptSection({
         </Collapsible>
       </div>
 
-      <div className={`px-5 py-4 space-y-3 ${DIVIDER}`}>
+      <div className={`px-4 sm:px-5 py-4 space-y-3 ${DIVIDER}`}>
         <AddItemForm onAdd={handleAdd} />
 
         {persons.length > 0 && (
@@ -200,7 +200,7 @@ export function ReceiptSection({
       </div>
 
       {receipt.items.length > 0 && totals && (
-        <div className={`px-5 py-4 ${DIVIDER}`}>
+        <div className={`px-4 sm:px-5 py-4 ${DIVIDER}`}>
           <Collapsible
             summary={
               <span className="flex items-center justify-between gap-3 text-sm">
@@ -258,7 +258,7 @@ export function ReceiptSection({
       )}
 
       {canRemove && (
-        <div className={`px-5 py-3 ${DIVIDER}`}>
+        <div className={`px-4 sm:px-5 py-3 ${DIVIDER}`}>
           <button
             onClick={removeReceipt}
             className={`${SUBTITLE_CLASS} hover:text-red-500 dark:hover:text-red-400 transition-colors`}

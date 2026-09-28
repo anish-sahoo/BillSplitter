@@ -2,7 +2,7 @@ import { motion, useMotionValue, useSpring } from "framer-motion";
 import type { ReactNode } from "react";
 import { BOUNCY } from "../../constants/motion";
 import { useTheme } from "../../hooks/useTheme";
-import { restingTilt } from "../../utils/crisp";
+import { LEAN_OK, restingTilt } from "../../utils/crisp";
 
 // Deterministic "random" tilt per card so the layout looks hand-placed but
 // doesn't jump around on every render.
@@ -35,7 +35,7 @@ export function Card({
   const tilt = flat ? 0 : tiltFor(seed);
   const rotateX = useSpring(useMotionValue(0), BOUNCY);
   const rotateY = useSpring(useMotionValue(0), BOUNCY);
-  const leans = lean && !flat;
+  const leans = lean && !flat && LEAN_OK;
 
   const handleMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!leans || e.pointerType !== "mouse") return;

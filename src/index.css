@@ -60,3 +60,20 @@ html.theme-flat.dark {
     background: white !important;
   }
 }
+
+/* Receipts row: cards dissolve into the scenery at both screen edges instead
+   of being cut off. Tablet and up only; on phones the mask forces the row onto
+   a low-resolution layer and blurs the text, and the edges are tiny anyway. */
+@media (min-width: 640px) {
+  .edge-fade {
+    --fade: linear-gradient(
+      to right,
+      transparent,
+      #000 var(--pad),
+      #000 calc(100% - var(--pad)),
+      transparent
+    );
+    mask-image: var(--fade);
+    -webkit-mask-image: var(--fade);
+  }
+}

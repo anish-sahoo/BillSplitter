@@ -1,7 +1,7 @@
 import { sanitizeDigits } from "../../utils/numeric";
 
 const STEP_BUTTON =
-  "w-9 sm:w-7 h-full flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-white/90 hover:bg-white/60 dark:hover:bg-white/15 transition-colors text-lg sm:text-base leading-none select-none";
+  "w-7 h-full flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-white/90 hover:bg-white/60 dark:hover:bg-white/15 transition-colors text-lg sm:text-base leading-none select-none";
 
 export function QuantityStepper({
   value,
@@ -33,7 +33,7 @@ export function QuantityStepper({
         onChange={(e) => onChange(sanitizeDigits(e.target.value))}
         onBlur={() => onChange(String(Math.max(1, current())))}
         onKeyDown={(e) => e.key === "Enter" && onEnter?.()}
-        className="w-9 sm:w-8 h-full text-center text-base sm:text-sm bg-transparent text-zinc-900 dark:text-white focus:outline-none tabular-nums"
+        className="w-7 sm:w-8 h-full text-center text-base sm:text-sm bg-transparent text-zinc-900 dark:text-white focus:outline-none tabular-nums"
       />
       <button
         type="button"

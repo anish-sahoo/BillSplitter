@@ -7,17 +7,11 @@ import { fmt } from "../../utils/format";
 import { ReceiptSection } from "./ReceiptSection";
 
 // --pad (set on the wrapper below) lines the first card up with the page
-// content: at least 0.75rem, or the 80rem content column's side margin.
+// content: at least 1rem (the phone margin), or the 80rem column's side margin.
 // pagePadding() is the same value, for measuring in JS.
 function pagePadding(): number {
-  return Math.max(12, (window.innerWidth - 1280) / 2 + 24);
+  return Math.max(16, (window.innerWidth - 1280) / 2 + 24);
 }
-
-// Cards dissolve into the scenery at both screen edges instead of being cut off
-const FADE =
-  "linear-gradient(to right, transparent, #000 var(--pad), #000 calc(100% - var(--pad)), transparent)";
-
-const EDGE_FADE = { maskImage: FADE, WebkitMaskImage: FADE };
 
 // Receipts sit side by side and snap into place when swiped. The tab row above
 // shows what's off-screen and jumps to a receipt, which also covers desktop
@@ -35,6 +29,24 @@ export function ReceiptCarousel({
   const { flat } = useTheme();
   const scroller = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
+  const tabs = useRef<HTMLDivElement>(null);
+
+  // Keep the active receipt's tab in view; on phones the tab row is wider
+  // than the screen. Scrolls only the tab row, never the page.
+  useEffect(() => {
+    const row = tabs.current;
+    const tab = row?.querySelectorAll("[data-receipt-tab]")[active];
+
+    if (!row || !(tab instanceof HTMLElement)) return;
+
+    const box = row.getBoundingClientRect();
+    const rect = tab.getBoundingClientRect();
+
+    row.scrollTo({
+      left: row.scrollLeft + rect.left - box.left - (box.width - rect.width) / 2,
+      behavior: "smooth",
+    });
+  }, [active]);
   const count = useRef(receipts.length);
 
   const cards = useRef<HTMLDivElement>(null);
@@ -121,9 +133,9 @@ export function ReceiptCarousel({
   return (
     // Full-bleed: the row spans the whole viewport, while the inline padding
     // lines the first card up with the page content above it.
-    <div className="space-y-2 mx-[calc(50%-50vw)] [--pad:max(0.75rem,calc((100vw-80rem)/2+1.5rem))] [--card:calc(100vw-3rem)] sm:[--card:440px] xl:[--card:480px]">
+    <div className="space-y-2 mx-[calc(50%-50vw)] [--pad:max(1rem,calc((100vw-80rem)/2+1.5rem))] [--card:calc(100vw-2rem)] sm:[--card:440px] xl:[--card:480px]">
       {/* Tabs */}
-      <div className="overflow-x-auto no-scrollbar px-[var(--pad)] py-1">
+      <div ref={tabs} className="overflow-x-auto no-scrollbar px-[var(--pad)] py-1">
         <div className="flex gap-2.5 w-max mx-auto">
           {receipts.map((receipt, i) => {
             const total = store.totals.receipts.get(receipt.id)?.totalCents ?? 0;
@@ -132,9 +144,9 @@ export function ReceiptCarousel({
             return (
               <motion.button
                 key={receipt.id}
+                data-receipt-tab
                 layout
                 whileTap={TAP}
-                animate={{ scale: on ? 1.05 : 1 }}
                 transition={BOUNCY}
                 onClick={() => scrollTo(i)}
                 className={`flex-shrink-0 h-9 px-3.5 rounded-full text-xs font-medium transition-colors flex items-center ${
@@ -165,10 +177,9 @@ export function ReceiptCarousel({
       <div
         ref={scroller}
         onScroll={handleScroll}
-        className={`overflow-x-auto no-scrollbar snap-x snap-mandatory py-6 -my-4 ${
+        className={`edge-fade overflow-x-auto no-scrollbar snap-x snap-mandatory py-6 -my-4 ${
           fits ? "px-[var(--pad)]" : "px-[calc(50vw-var(--card)/2)]"
         }`}
-        style={EDGE_FADE}
       >
         <div ref={cards} className={`flex items-start gap-4 w-max ${fits ? "mx-auto" : ""}`}>
           {receipts.map((receipt, i) => (
@@ -178,7 +189,14 @@ export function ReceiptCarousel({
               key={receipt.id}
               animate={
                 i === active
-                  ? { opacity: 1, scale: 1, filter: "saturate(1)" }
+                  ? // Drop the filter once settled: even saturate(1) keeps the card
+                    // on its own layer, which renders text soft on phones
+                    {
+                      opacity: 1,
+                      scale: 1,
+                      filter: "saturate(1)",
+                      transitionEnd: { filter: "none" },
+                    }
                   : { opacity: 0.5, scale: 0.94, filter: "saturate(0)" }
               }
               transition={SOFT}

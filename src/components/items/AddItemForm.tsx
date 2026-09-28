@@ -26,21 +26,20 @@ export function AddItemForm({
   };
 
   return (
-    // One row from `sm` up. On phones the name gets its own full-width row,
-    // with quantity, price and Add underneath.
-    <div className="flex flex-wrap sm:flex-nowrap gap-2">
+    // One row at every width; the name field takes whatever space is left
+    <div className="flex gap-1.5 sm:gap-2">
       <input
         type="text"
         value={name}
         onChange={(e) => setName(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && submit()}
-        placeholder="Item name…"
+        placeholder="Item…"
         aria-label="Item name"
         autoComplete="off"
-        className={`basis-full sm:basis-auto sm:flex-1 min-w-0 px-3 ${INPUT_CLASS}`}
+        className={`flex-1 min-w-0 px-3 ${INPUT_CLASS}`}
       />
       <QuantityStepper value={qty} onChange={setQty} onEnter={submit} />
-      <div className="relative flex-1 sm:flex-none sm:w-24 min-w-0">
+      <div className="relative w-[4.75rem] sm:w-24 flex-shrink-0">
         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-base sm:text-sm pointer-events-none">
           $
         </span>
@@ -53,7 +52,7 @@ export function AddItemForm({
           onChange={(e) => setPrice(sanitizeDecimal(e.target.value))}
           onKeyDown={(e) => e.key === "Enter" && submit()}
           placeholder="0.00"
-          className={`w-full pl-7 pr-3 tabular-nums ${INPUT_CLASS}`}
+          className={`w-full pl-6 sm:pl-7 pr-2 sm:pr-3 tabular-nums ${INPUT_CLASS}`}
         />
       </div>
       <motion.button
@@ -61,7 +60,7 @@ export function AddItemForm({
         transition={SNAPPY}
         onClick={submit}
         disabled={!canAdd}
-        className={PRIMARY_BUTTON_CLASS}
+        className={`${PRIMARY_BUTTON_CLASS} !px-3 sm:!px-4`}
       >
         Add
       </motion.button>

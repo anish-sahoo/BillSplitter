@@ -41,6 +41,21 @@ export function BillEditor({ onThemeChange }: { onThemeChange: (theme: ThemeName
   const handleShare = async () => {
     const url = await shareUrl(bill, themeName);
 
+    // Phones get the native share sheet (Messages, WhatsApp, AirDrop, ...).
+    // Desktop browsers with a share API tend to show a clunky dialog, so they
+    // copy the link instead.
+    const touch = window.matchMedia("(pointer: coarse)").matches;
+
+    if (touch && navigator.share) {
+      try {
+        await navigator.share({ title: billLabel(bill), url });
+      } catch {
+        // Dismissing the share sheet rejects; nothing to do
+      }
+
+      return;
+    }
+
     try {
       await navigator.clipboard.writeText(url);
       setShareLabel("Link copied");
@@ -90,7 +105,7 @@ export function BillEditor({ onThemeChange }: { onThemeChange: (theme: ThemeName
     <div className="min-h-screen">
       {header}
 
-      <main className="max-w-7xl mx-auto px-3 sm:px-6 pt-6 sm:pt-10 pb-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-6 sm:pt-10 pb-6">
         {/* Below `lg` every wrapper is `display: contents`, so the cards join
             one stack and `order` sets the phone order. */}
         <div className="flex flex-col gap-6 lg:gap-10">

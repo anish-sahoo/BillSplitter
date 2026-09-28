@@ -111,7 +111,7 @@ export function BillsPage({ onThemeChange }: { onThemeChange: (theme: ThemeName)
       <Header onThemeChange={onThemeChange} />
 
       <main
-        className={`mx-auto px-3 sm:px-6 pt-8 sm:pt-12 pb-6 ${flat ? "max-w-2xl" : "max-w-7xl"}`}
+        className={`mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-6 ${flat ? "max-w-2xl" : "max-w-7xl"}`}
       >
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
