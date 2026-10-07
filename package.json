@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "tsc && vite build",
+    "build": "tsc && tsc -p worker && vite build",
     "lint": "oxlint . --report-unused-disable-directives",
     "test": "vitest run",
     "format": "oxfmt .",

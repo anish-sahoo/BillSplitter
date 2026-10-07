@@ -37,5 +37,5 @@
     "anti-slop/require-readable-spacing": "error",
     "anti-slop/require-safety-comment-for-type-assertion": "error"
   },
-  "ignorePatterns": ["dist", "tools/oxlint/anti-slop/**"]
+  "ignorePatterns": ["dist", "worker/worker-configuration.d.ts", "tools/oxlint/anti-slop/**"]
 }
