@@ -5,7 +5,7 @@ import { restingTilt } from "../utils/crisp";
 import { useTheme } from "../hooks/useTheme";
 import { useLocation } from "react-router-dom";
 import { billTotals } from "../lib/calc";
-import { decodeBill } from "../lib/shareLink";
+import { loadSharedBill } from "../lib/shareLink";
 import type { Bill } from "../types";
 import { billLabel, fmt, trim } from "../utils/format";
 
@@ -149,7 +149,7 @@ export function ReceiptView() {
 
   useEffect(() => {
     let cancelled = false;
-    decodeBill(hash.slice(1)).then((decoded) => {
+    loadSharedBill(hash.slice(1)).then((decoded) => {
       if (!cancelled) setBill(decoded);
     });
 
@@ -193,7 +193,7 @@ export function ReceiptView() {
         )}
         {bill === null && (
           <p className="text-center text-sm text-zinc-600 dark:text-white/70">
-            This link is incomplete or invalid. Ask for the link again.
+            This link is incomplete, invalid, or expired. Ask for the link again.
           </p>
         )}
         {bill && (
